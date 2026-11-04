@@ -9,12 +9,24 @@
     if (msg && !window.confirm(msg)) e.preventDefault();
   });
 
-  // Upload genérico
+  // Upload: pede autorização ao servidor; com Supabase, o arquivo vai direto do navegador para o Storage
+  function postJSON(url, data) {
+    return fetch(url, { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF, Accept: 'application/json' } })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.error || 'Falha no envio'); return j; }); });
+  }
   function uploadFile(file) {
-    var fd = new FormData();
-    fd.append('file', file);
-    return fetch('/admin/midia/enviar', { method: 'POST', body: fd, headers: { 'X-CSRF-Token': CSRF, Accept: 'application/json' } })
-      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || 'Falha no envio'); return j; }); });
+    var meta = { name: file.name, type: file.type, size: file.size };
+    return postJSON('/admin/midia/assinar', meta).then(function (sig) {
+      if (sig.mode === 'supabase') {
+        return fetch(sig.signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type, 'x-upsert': 'false', 'cache-control': 'max-age=31536000' } })
+          .then(function (r) { if (!r.ok) return r.text().then(function (t) { throw new Error('O armazenamento recusou o arquivo (' + r.status + '). ' + t.slice(0, 120)); }); })
+          .then(function () { meta.path = sig.path; return postJSON('/admin/midia/confirmar', meta); });
+      }
+      var fd = new FormData();
+      fd.append('file', file);
+      return fetch('/admin/midia/enviar', { method: 'POST', body: fd, headers: { 'X-CSRF-Token': CSRF, Accept: 'application/json' } })
+        .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || 'Falha no envio'); return j; }); });
+    });
   }
   window.uploadFile = uploadFile;
 
@@ -66,13 +78,13 @@
   function initImageField(box) {
     var input = box.querySelector('input');
     var prev = box.querySelector('.image-field__preview');
+    function render() { prev.innerHTML = input.value ? '<img src="' + esc(input.value) + '" alt="">' : '<span class="muted small">Nenhuma imagem</span>'; }
     function change(value) {
       input.value = value;
       render();
       input.dispatchEvent(new Event('input', { bubbles: true }));
       input.dispatchEvent(new Event('change', { bubbles: true }));
     }
-    function render() { prev.innerHTML = input.value ? '<img src="' + esc(input.value) + '" alt="">' : '<span class="muted small">Nenhuma imagem</span>'; }
     box.querySelector('[data-pick]').addEventListener('click', function () { openMediaPicker(function (url) { change(url); }); });
     box.querySelector('[data-clear]').addEventListener('click', function () { change(''); });
     render();
@@ -90,7 +102,7 @@
   });
   document.querySelectorAll('[data-copy]').forEach(function (b) {
     b.addEventListener('click', function () {
-      var url = location.origin + b.getAttribute('data-copy');
+      var raw = b.getAttribute('data-copy'); var url = /^https?:/.test(raw) ? raw : location.origin + raw;
       (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () {
         b.classList.add('is-copied'); setTimeout(function () { b.classList.remove('is-copied'); }, 1200);
       }).catch(function () { prompt('Copie o endereço:', url); });

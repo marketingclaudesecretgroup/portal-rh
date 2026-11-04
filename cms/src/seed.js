@@ -1,5 +1,4 @@
 // Conteúdo inicial: páginas montadas com os textos já criados para o Comunica Secret.
-const { db, saveSettings } = require('./db');
 const { cleanBlocks } = require('./blocks');
 
 const WA = 'https://wa.me/5541984165836';
@@ -252,19 +251,27 @@ const ARTICLES = [
     content: '<p>Parabéns a todas as pessoas que fazem aniversário neste mês! 🎉</p><p>Atualize esta lista mensalmente com os nomes autorizados para divulgação.</p>' }
 ];
 
-function seedIfEmpty() {
-  if (db.prepare('SELECT COUNT(*) n FROM pages').get().n > 0) return;
-  const ids = {};
-  const ins = db.prepare("INSERT INTO pages (title, slug, parent_id, menu_order, show_in_menu, menu_label, status, meta_description, blocks) VALUES (?,?,?,?,?,?,'published',?,?)");
-  db.transaction(() => {
+async function seedIfEmpty() {
+  const { db, saveSettings } = require('./db');
+  const created = await db.tx(async (c) => {
+    await c.run('SELECT pg_advisory_xact_lock(4242)'); // evita duas instâncias criando ao mesmo tempo
+    if ((await c.get('SELECT COUNT(*) n FROM pages')).n > 0) return null;
+    const ids = {};
     for (const p of PAGES) {
-      ids[p.slug] = ins.run(p.title, p.slug, p.parent ? ids[p.parent] : null, p.order, p.menu, p.menu_label || null, p.meta || '', JSON.stringify(cleanBlocks(p.blocks))).lastInsertRowid;
+      const r = await c.get("INSERT INTO pages (title, slug, parent_id, menu_order, show_in_menu, menu_label, status, meta_description, blocks) VALUES (?,?,?,?,?,?,'published',?,?) RETURNING id",
+        [p.title, p.slug, p.parent ? ids[p.parent] : null, p.order, !!p.menu, p.menu_label || null, p.meta || '', JSON.stringify(cleanBlocks(p.blocks))]);
+      ids[p.slug] = r.id;
     }
-    const insA = db.prepare("INSERT INTO articles (title, slug, category, excerpt, content, status, featured, published_at) VALUES (?,?,?,?,?,'published',?,datetime('now', ?))");
-    for (const a of ARTICLES) insA.run(a.title, a.slug, a.category, a.excerpt, a.content, a.featured || 0, `-${a.days} days`);
-  })();
-  saveSettings({ home_page_id: ids.inicio });
-  console.log('  Conteúdo inicial criado (9 páginas e 4 comunicados de exemplo).');
+    for (const a of ARTICLES) {
+      await c.run("INSERT INTO articles (title, slug, category, excerpt, content, status, featured, published_at) VALUES (?,?,?,?,?,'published',?, now() - make_interval(days => ?::int))",
+        [a.title, a.slug, a.category, a.excerpt, a.content, !!a.featured, a.days]);
+    }
+    return ids;
+  });
+  if (created) {
+    await saveSettings({ home_page_id: created.inicio });
+    console.log('  Conteúdo inicial criado (9 páginas e 4 comunicados de exemplo).');
+  }
 }
 
 module.exports = { seedIfEmpty };

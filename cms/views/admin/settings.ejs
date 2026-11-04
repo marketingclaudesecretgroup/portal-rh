@@ -16,7 +16,7 @@
       </div>
     </div>
     <label class="field"><span>Página inicial</span>
-      <select name="home_page_id"><option value="">Automático (página “inicio”)</option>
+      <select name="home_page_id">
         <% pages.forEach(function(p){ %><option value="<%= p.id %>" <%= String(settings.home_page_id)===String(p.id)?'selected':'' %>><%= p.title %></option><% }) %>
       </select>
     </label>

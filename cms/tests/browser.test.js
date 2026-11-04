@@ -86,7 +86,7 @@ test('editor de blocos cria texto, duplica, reordena, oculta e salva', async t =
   await page.getByRole('button', { name: 'Salvar página', exact: true }).click();
   await page.waitForURL(/\/admin\/paginas\/\d+$/);
   assert.equal(await page.locator('.block').count(), 3);
-  const saved = portal.db.prepare("SELECT blocks FROM pages WHERE slug='pagina-navegador'").get();
+  const saved = (await portal.db.prepare("SELECT blocks FROM pages WHERE slug='pagina-navegador'").get());
   const blocks = JSON.parse(saved.blocks);
   assert.equal(blocks[0].data.title, 'Segundo bloco');
   assert.equal(blocks[1].hidden, true);

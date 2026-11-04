@@ -17,7 +17,7 @@ const pageId = response => Number(response.headers.get('location').split('/').po
 const postArticle = values => admin.post('/admin/comunicados/0', { title: 'Comunicado QA', status: 'published', content: '<p>Conteúdo QA</p>', ...values });
 
 test('todas as páginas e os links internos iniciais respondem', async () => {
-  const urls = ['/', '/comunicados', ...portal.db.prepare('SELECT slug FROM pages').all().map(p => '/' + p.slug), ...portal.db.prepare('SELECT slug FROM articles').all().map(a => '/comunicados/' + a.slug)];
+  const urls = ['/', '/comunicados', ...(await portal.db.prepare('SELECT slug FROM pages').all()).map(p => '/' + p.slug), ...(await portal.db.prepare('SELECT slug FROM articles').all()).map(a => '/comunicados/' + a.slug)];
   const links = new Set();
   for (const url of urls) {
     const response = await visitor.get(url);
@@ -35,15 +35,15 @@ test('404 e arquivos CSS, JS e Quill', async () => {
 });
 
 test('configuração inicial fecha após criar o administrador', async () => {
-  assert.equal(portal.db.prepare('SELECT COUNT(*) n FROM users').get().n, 1);
+  assert.equal((await portal.db.prepare('SELECT COUNT(*) n FROM users').get()).n, 1);
   assert.equal((await visitor.get('/admin/setup')).status, 302);
   assert.equal((await visitor.post('/admin/setup', credentials)).status, 403);
 });
 
 test('todos os formulários e listas do painel renderizam', async () => {
   const urls = ['/admin', '/admin/paginas', '/admin/paginas/nova', '/admin/comunicados', '/admin/comunicados/novo', '/admin/midia', '/admin/midia.json', '/admin/usuarios', '/admin/usuarios/novo', '/admin/configuracoes', '/admin/perfil', '/admin/usuarios/1'];
-  urls.push(...portal.db.prepare('SELECT id FROM pages').all().map(p => '/admin/paginas/' + p.id));
-  urls.push(...portal.db.prepare('SELECT id FROM articles').all().map(a => '/admin/comunicados/' + a.id));
+  urls.push(...(await portal.db.prepare('SELECT id FROM pages').all()).map(p => '/admin/paginas/' + p.id));
+  urls.push(...(await portal.db.prepare('SELECT id FROM articles').all()).map(a => '/admin/comunicados/' + a.id));
   for (const url of urls) assert.equal((await admin.get(url)).status, 200, url);
 });
 
@@ -53,9 +53,9 @@ test('rotas do painel e API exigem autenticação', async () => {
 });
 
 test('CSRF impede alteração sem token e com token inválido', async () => {
-  const count = portal.db.prepare('SELECT COUNT(*) n FROM pages').get().n;
+  const count = (await portal.db.prepare('SELECT COUNT(*) n FROM pages').get()).n;
   for (const _csrf of ['', 'invalido']) assert.equal((await admin.post('/admin/paginas/0', { title: 'Invasão', _csrf })).status, 403);
-  assert.equal(portal.db.prepare('SELECT COUNT(*) n FROM pages').get().n, count);
+  assert.equal((await portal.db.prepare('SELECT COUNT(*) n FROM pages').get()).n, count);
 });
 
 test('páginas: criar, editar, visualizar rascunho, publicar, duplicar e excluir', async () => {
@@ -68,28 +68,28 @@ test('páginas: criar, editar, visualizar rascunho, publicar, duplicar e excluir
   assert.match((await visitor.get('/pagina-integracao')).text, /Texto atualizado/);
   const copy = await admin.post(`/admin/paginas/${id}/duplicar`);
   assert.equal(copy.status, 302);
-  assert.equal(portal.db.prepare('SELECT status FROM pages WHERE id=?').get(pageId(copy)).status, 'draft');
+  assert.equal((await portal.db.prepare('SELECT status FROM pages WHERE id=?').get(pageId(copy))).status, 'draft');
   await admin.post(`/admin/paginas/${id}/excluir`);
   assert.equal((await visitor.get('/pagina-integracao')).status, 404);
 });
 
 test('slugs duplicados e reservados recebem endereço válido', async () => {
   const a = pageId(await postPage({ slug: 'beneficios' }));
-  assert.notEqual(portal.db.prepare('SELECT slug FROM pages WHERE id=?').get(a).slug, 'beneficios');
+  assert.notEqual((await portal.db.prepare('SELECT slug FROM pages WHERE id=?').get(a)).slug, 'beneficios');
   const b = pageId(await postPage({ slug: 'admin' }));
-  assert.notEqual(portal.db.prepare('SELECT slug FROM pages WHERE id=?').get(b).slug, 'admin');
+  assert.notEqual((await portal.db.prepare('SELECT slug FROM pages WHERE id=?').get(b)).slug, 'admin');
 });
 
 test('página inicial não pode ser excluída', async () => {
-  const id = Number(portal.db.prepare("SELECT value FROM settings WHERE key='home_page_id'").get().value);
+  const id = Number((await portal.db.prepare("SELECT value FROM settings WHERE key='home_page_id'").get()).value);
   assert.equal((await admin.post(`/admin/paginas/${id}/excluir`)).status, 302);
-  assert.ok(portal.db.prepare('SELECT id FROM pages WHERE id=?').get(id));
+  assert.ok((await portal.db.prepare('SELECT id FROM pages WHERE id=?').get(id)));
 });
 
 test('página-mãe inexistente é rejeitada sem erro 500', async () => {
   const response = await postPage({ slug: 'mae-invalida', parent_id: '999999' });
   assert.equal(response.status, 400);
-  assert.equal(portal.db.prepare("SELECT COUNT(*) n FROM pages WHERE slug='mae-invalida'").get().n, 0);
+  assert.equal((await portal.db.prepare("SELECT COUNT(*) n FROM pages WHERE slug='mae-invalida'").get()).n, 0);
 });
 
 test('menu impede ciclo entre página e subpágina', async () => {
@@ -97,7 +97,7 @@ test('menu impede ciclo entre página e subpágina', async () => {
   const child = pageId(await postPage({ slug: 'filha-ciclo', parent_id: String(parent), show_in_menu: 'on' }));
   const response = await admin.post('/admin/paginas/' + parent, { title: 'Mãe', slug: 'mae-ciclo', status: 'published', parent_id: String(child), blocks: '[]' });
   assert.equal(response.status, 400);
-  assert.equal(portal.db.prepare('SELECT parent_id FROM pages WHERE id=?').get(parent).parent_id, null);
+  assert.equal((await portal.db.prepare('SELECT parent_id FROM pages WHERE id=?').get(parent)).parent_id, null);
 });
 
 test('árvore do menu não permite mover página com filhos para terceiro nível', async () => {
@@ -140,13 +140,13 @@ test('comunicados: criar, filtrar, editar, rascunho e excluir', async () => {
   assert.equal((await visitor.get('/comunicados/artigo-integracao')).status, 404);
   assert.equal((await admin.get('/comunicados/artigo-integracao')).status, 200);
   await admin.post(`/admin/comunicados/${id}/excluir`);
-  assert.equal(portal.db.prepare('SELECT id FROM articles WHERE id=?').get(id), undefined);
+  assert.equal((await portal.db.prepare('SELECT id FROM articles WHERE id=?').get(id)), undefined);
 });
 
 test('agendamento esconde comunicado futuro também no endereço direto', async () => {
   const response = await postArticle({ slug: 'futuro-qa', category: 'Categoria secreta futura', published_at: '2099-11-01T12:30' });
   assert.equal(response.status, 302);
-  assert.equal(portal.db.prepare("SELECT published_at FROM articles WHERE slug='futuro-qa'").get().published_at, '2099-11-01 15:30:00');
+  assert.equal((await portal.db.prepare("SELECT published_at FROM articles WHERE slug='futuro-qa'").get()).published_at, '2099-11-01 15:30:00');
   assert.equal((await visitor.get('/comunicados/futuro-qa')).status, 404);
   assert.equal((await admin.get('/comunicados/futuro-qa')).status, 200);
 });
@@ -161,12 +161,12 @@ test('categorias e listagem não revelam comunicados futuros', async () => {
 test('data de publicação com segundos preserva o agendamento', async () => {
   const response = await postArticle({ slug: 'data-com-segundos', published_at: '2099-11-01T12:30:45' });
   assert.equal(response.status, 302);
-  assert.equal(portal.db.prepare("SELECT published_at FROM articles WHERE slug='data-com-segundos'").get().published_at, '2099-11-01 15:30:45');
+  assert.equal((await portal.db.prepare("SELECT published_at FROM articles WHERE slug='data-com-segundos'").get()).published_at, '2099-11-01 15:30:45');
 });
 
 test('data inválida é rejeitada sem publicar imediatamente', async () => {
   assert.equal((await postArticle({ slug: 'data-invalida', published_at: 'nao-e-data' })).status, 400);
-  assert.equal(portal.db.prepare("SELECT COUNT(*) n FROM articles WHERE slug='data-invalida'").get().n, 0);
+  assert.equal((await portal.db.prepare("SELECT COUNT(*) n FROM articles WHERE slug='data-invalida'").get()).n, 0);
 });
 
 test('datas impossíveis e horários inválidos são rejeitados', async () => {
@@ -179,7 +179,7 @@ test('HTML exportado pelo editor é sanitizado antes de ser publicado', async ()
   const content = '<p>Conteúdo seguro</p><img src="x" onerror="alert(1)"><a href="javascript:alert(1)">Link</a><script>alert(1)</script>';
   const response = await postArticle({ slug: 'sanitizacao-editor', content });
   assert.equal(response.status, 302);
-  const saved = portal.db.prepare("SELECT content FROM articles WHERE slug='sanitizacao-editor'").get().content;
+  const saved = (await portal.db.prepare("SELECT content FROM articles WHERE slug='sanitizacao-editor'").get()).content;
   assert.match(saved, /Conteúdo seguro/);
   assert.doesNotMatch(saved, /onerror|javascript:|<script/);
   const published = await visitor.get('/comunicados/sanitizacao-editor');
@@ -200,9 +200,9 @@ test('atualizações de registros inexistentes não retornam sucesso nem erro 50
 });
 
 test('ID inválido não cria conteúdo novo por acidente', async () => {
-  const before = portal.db.prepare('SELECT COUNT(*) n FROM pages').get().n;
+  const before = (await portal.db.prepare('SELECT COUNT(*) n FROM pages').get()).n;
   assert.equal((await admin.post('/admin/paginas/invalido', { title: 'Acidental', blocks: '[]' })).status, 400);
-  assert.equal(portal.db.prepare('SELECT COUNT(*) n FROM pages').get().n, before);
+  assert.equal((await portal.db.prepare('SELECT COUNT(*) n FROM pages').get()).n, before);
 });
 
 test('upload de imagem e PDF, listagem, download e exclusão', async () => {
@@ -214,7 +214,7 @@ test('upload de imagem e PDF, listagem, download e exclusão', async () => {
     assert.equal((await visitor.get(item.url)).status, 200);
     assert.ok((await admin.get('/admin/midia.json')).json().some(m => m.id === item.id));
     assert.equal((await admin.post(`/admin/midia/${item.id}/excluir`)).status, 302);
-    assert.equal(portal.db.prepare('SELECT id FROM media WHERE id=?').get(item.id), undefined);
+    assert.equal((await portal.db.prepare('SELECT id FROM media WHERE id=?').get(item.id)), undefined);
     await assert.rejects(fs.access(path.join(portal.dataDir, item.url.slice(1))));
   }
 });
@@ -242,22 +242,22 @@ test('usuários: criar editor, impedir duplicidade e validar permissões', async
   for (const url of ['/admin/usuarios', '/admin/configuracoes']) assert.equal((await editor.get(url)).status, 403);
   assert.equal((await editor.post('/admin/usuarios/0', values)).status, 403);
   const response = await editor.post('/admin/paginas/0', { title: 'Tentativa de início', set_home: 'on', blocks: '[]' });
-  assert.notEqual(portal.db.prepare("SELECT value FROM settings WHERE key='home_page_id'").get().value, String(pageId(response)));
+  assert.notEqual((await portal.db.prepare("SELECT value FROM settings WHERE key='home_page_id'").get()).value, String(pageId(response)));
 });
 
 test('último administrador não pode ser desativado ou rebaixado', async () => {
-  const id = portal.db.prepare('SELECT id FROM users WHERE email=?').get(credentials.email).id;
+  const id = (await portal.db.prepare('SELECT id FROM users WHERE email=?').get(credentials.email)).id;
   const response = await admin.post('/admin/usuarios/' + id, { ...credentials, password: '', role: 'editor', active: 'on' });
   assert.match(response.text, /pelo menos um administrador ativo/);
-  assert.equal(portal.db.prepare('SELECT role FROM users WHERE id=?').get(id).role, 'admin');
+  assert.equal((await portal.db.prepare('SELECT role FROM users WHERE id=?').get(id)).role, 'admin');
   await admin.post(`/admin/usuarios/${id}/excluir`);
-  assert.ok(portal.db.prepare('SELECT id FROM users WHERE id=?').get(id));
+  assert.ok((await portal.db.prepare('SELECT id FROM users WHERE id=?').get(id)));
 });
 
 test('desativar e reativar usuário não restaura sessões antigas', async () => {
   await admin.post('/admin/usuarios/0', { name: 'Temporário', email: 'temporary@example.test', password: 'TesteSessao123!', role: 'editor', active: 'on' });
   const user = await login(portal, 'temporary@example.test', 'TesteSessao123!');
-  const id = portal.db.prepare("SELECT id FROM users WHERE email='temporary@example.test'").get().id;
+  const id = (await portal.db.prepare("SELECT id FROM users WHERE email='temporary@example.test'").get()).id;
   const values = { name: 'Temporário', email: 'temporary@example.test', role: 'editor' };
   await admin.post('/admin/usuarios/' + id, values);
   await admin.post('/admin/usuarios/' + id, { ...values, active: 'on' });
@@ -267,7 +267,7 @@ test('desativar e reativar usuário não restaura sessões antigas', async () =>
 test('troca de senha pelo administrador invalida sessões anteriores', async () => {
   await admin.post('/admin/usuarios/0', { name: 'Senha QA', email: 'senha@example.test', password: 'SenhaAntiga123!', role: 'editor', active: 'on' });
   const user = await login(portal, 'senha@example.test', 'SenhaAntiga123!');
-  const id = portal.db.prepare("SELECT id FROM users WHERE email='senha@example.test'").get().id;
+  const id = (await portal.db.prepare("SELECT id FROM users WHERE email='senha@example.test'").get()).id;
   await admin.post('/admin/usuarios/' + id, { name: 'Senha QA', email: 'senha@example.test', password: 'SenhaNova123!', role: 'editor', active: 'on' });
   assert.equal((await user.get('/admin')).status, 302);
   assert.equal((await (await login(portal, 'senha@example.test', 'SenhaNova123!')).get('/admin')).status, 200);
@@ -309,7 +309,7 @@ test('configurações salvam identidade e removem links javascript', async () =>
 
 test('página inicial inexistente nas configurações é rejeitada', async () => {
   assert.equal((await admin.post('/admin/configuracoes', { site_name: 'Portal RH QA', home_page_id: '999999' })).status, 400);
-  assert.equal(portal.db.prepare("SELECT value FROM settings WHERE key='home_page_id'").get().value, '1');
+  assert.equal((await portal.db.prepare("SELECT value FROM settings WHERE key='home_page_id'").get()).value, '1');
 });
 
 test('logout encerra a sessão', async () => {
@@ -325,7 +325,13 @@ test('limite de login bloqueia a décima primeira tentativa', async () => {
   assert.equal((await user.post('/admin/login', credentials)).status, 429);
 });
 
-test('banco permanece íntegro após os fluxos completos', () => {
-  assert.equal(portal.db.pragma('integrity_check', { simple: true }), 'ok');
-  assert.deepEqual(portal.db.pragma('foreign_key_check'), []);
+test('banco permanece íntegro após os fluxos completos', async () => {
+  // Nenhuma referência órfã entre páginas, comunicados, mídia e usuários
+  const orphans = await portal.db.prepare(`
+    SELECT 'pages.parent_id' ref FROM pages p WHERE p.parent_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM pages x WHERE x.id = p.parent_id)
+    UNION ALL SELECT 'pages.updated_by' FROM pages p WHERE p.updated_by IS NOT NULL AND NOT EXISTS (SELECT 1 FROM users u WHERE u.id = p.updated_by)
+    UNION ALL SELECT 'articles.author_id' FROM articles a WHERE a.author_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM users u WHERE u.id = a.author_id)
+    UNION ALL SELECT 'media.uploaded_by' FROM media m WHERE m.uploaded_by IS NOT NULL AND NOT EXISTS (SELECT 1 FROM users u WHERE u.id = m.uploaded_by)`).all();
+  assert.deepEqual(orphans, []);
+  assert.equal((await portal.db.prepare('SELECT COUNT(*) n FROM pages').get()).n > 0, true);
 });

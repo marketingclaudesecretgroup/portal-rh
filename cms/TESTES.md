@@ -1,5 +1,16 @@
 # Verificação do Portal RH
 
+## Versão Vercel + Supabase (04/11/2026)
+
+O CMS passou a usar Postgres (Supabase) no lugar do SQLite e o Supabase Storage para arquivos. Todas as correções listadas abaixo foram mantidas na nova versão, e a mesma suíte foi adaptada para o Postgres (cada execução usa um *schema* temporário).
+
+- `npm test`: **39 testes passaram** (Linux, Node.js 22, PostgreSQL 17).
+- `npm run test:ui`: **8 testes passaram** (Chromium headless).
+- O teste de integridade do SQLite (`PRAGMA integrity_check`) foi substituído por uma verificação de referências órfãs no Postgres.
+- Os testes usam armazenamento local de arquivos; o envio direto ao Supabase Storage (URL assinada) deve ser conferido no primeiro deploy.
+
+## Versão SQLite (histórico)
+
 Execução em 04/11/2026, Windows, Node.js 24.14.1 e Chrome em modo headless pelo Playwright.
 
 ## Resultado

@@ -2,62 +2,59 @@ const crypto = require('crypto');
 const session = require('express-session');
 const { db } = require('./db');
 
-// ---- Session store em SQLite (sem dependência extra) ----
-class SqliteStore extends session.Store {
-  constructor() {
-    super();
-    this.getStmt = db.prepare('SELECT sess, expires FROM sessions WHERE sid = ?');
-    this.setStmt = db.prepare('INSERT INTO sessions (sid, sess, expires) VALUES (?, ?, ?) ON CONFLICT(sid) DO UPDATE SET sess = excluded.sess, expires = excluded.expires');
-    this.delStmt = db.prepare('DELETE FROM sessions WHERE sid = ?');
-    setInterval(() => db.prepare('DELETE FROM sessions WHERE expires < ?').run(Date.now()), 60 * 60 * 1000).unref();
-  }
+// ---- Sessões guardadas no Postgres ----
+class PgStore extends session.Store {
   get(sid, cb) {
-    try {
-      const row = this.getStmt.get(sid);
-      if (!row || row.expires < Date.now()) return cb(null, null);
-      cb(null, JSON.parse(row.sess));
-    } catch (e) { cb(e); }
+    db.get('SELECT sess FROM sessions WHERE sid = ? AND expires > now()', [sid])
+      .then((r) => cb(null, r ? r.sess : null), cb);
   }
   set(sid, sess, cb) {
-    try {
-      const exp = sess.cookie && sess.cookie.expires ? new Date(sess.cookie.expires).getTime() : Date.now() + 86400000;
-      this.setStmt.run(sid, JSON.stringify(sess), exp);
-      cb && cb(null);
-    } catch (e) { cb && cb(e); }
+    const exp = sess.cookie && sess.cookie.expires ? new Date(sess.cookie.expires) : new Date(Date.now() + 86400000);
+    db.run('INSERT INTO sessions (sid, sess, user_id, expires) VALUES (?, ?, ?, ?) ON CONFLICT (sid) DO UPDATE SET sess = EXCLUDED.sess, user_id = EXCLUDED.user_id, expires = EXCLUDED.expires',
+      [sid, JSON.stringify(sess), sess.userId || null, exp])
+      .then(() => cb && cb(null), (e) => cb && cb(e));
+    // Limpeza ocasional de sessões vencidas
+    if (Math.random() < 0.02) db.run('DELETE FROM sessions WHERE expires < now()').catch(() => {});
   }
-  destroy(sid, cb) { try { this.delStmt.run(sid); cb && cb(null); } catch (e) { cb && cb(e); } }
+  destroy(sid, cb) { db.run('DELETE FROM sessions WHERE sid = ?', [sid]).then(() => cb && cb(null), (e) => cb && cb(e)); }
   touch(sid, sess, cb) { this.set(sid, sess, cb); }
 }
 
-// Segredo da sessão: variável de ambiente ou gerado e salvo no banco
-function getSecret() {
+async function getSecret() {
   if (process.env.SESSION_SECRET) return process.env.SESSION_SECRET;
-  const row = db.prepare("SELECT value FROM settings WHERE key = '_session_secret'").get();
+  const row = await db.get("SELECT value FROM settings WHERE key = '_session_secret'");
   if (row) return row.value;
   const s = crypto.randomBytes(32).toString('hex');
-  db.prepare("INSERT INTO settings (key, value) VALUES ('_session_secret', ?)").run(s);
-  return s;
+  await db.run("INSERT INTO settings (key, value) VALUES ('_session_secret', ?) ON CONFLICT (key) DO NOTHING", [s]);
+  return (await db.get("SELECT value FROM settings WHERE key = '_session_secret'")).value;
 }
 
-const sessionMiddleware = session({
-  store: new SqliteStore(),
-  secret: getSecret(),
-  name: 'cs.sid',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.COOKIE_SECURE === 'true',
-    maxAge: 1000 * 60 * 60 * 12
+// O middleware de sessão é criado depois de ler o segredo
+let sessionMw;
+async function sessionMiddleware(req, res, next) {
+  if (!sessionMw) {
+    sessionMw = session({
+      store: new PgStore(),
+      secret: await getSecret(),
+      name: 'cs.sid',
+      resave: false,
+      saveUninitialized: false,
+      proxy: true,
+      cookie: {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.COOKIE_SECURE ? process.env.COOKIE_SECURE === 'true' : !!process.env.VERCEL,
+        maxAge: 1000 * 60 * 60 * 12
+      }
+    });
   }
-});
+  sessionMw(req, res, next);
+}
 
-// Carrega usuário logado
-function loadUser(req, res, next) {
+async function loadUser(req, res, next) {
   res.locals.currentUser = null;
   if (req.session && req.session.userId) {
-    const u = db.prepare('SELECT id, name, email, role, active FROM users WHERE id = ?').get(req.session.userId);
+    const u = await db.get('SELECT id, name, email, role, active FROM users WHERE id = ?', [req.session.userId]);
     if (u && u.active) { req.user = u; res.locals.currentUser = u; }
     else delete req.session.userId;
   }
@@ -66,7 +63,7 @@ function loadUser(req, res, next) {
 
 function requireLogin(req, res, next) {
   if (req.user) return next();
-  if (req.xhr || (req.headers.accept || '').includes('application/json')) return res.status(401).json({ error: 'Sessão expirada. Faça login novamente.' });
+  if ((req.headers.accept || '').includes('application/json')) return res.status(401).json({ error: 'Sessão expirada. Faça login novamente.' });
   res.redirect('/admin/login?next=' + encodeURIComponent(req.originalUrl));
 }
 
@@ -75,9 +72,9 @@ function requireAdmin(req, res, next) {
   res.status(403).render('admin/error', { title: 'Acesso restrito', message: 'Somente administradores podem acessar esta área.' });
 }
 
+// Encerra as sessões de um usuário (exceto, opcionalmente, a atual)
 function revokeUserSessions(userId, exceptSid) {
-  db.prepare("DELETE FROM sessions WHERE json_extract(sess, '$.userId') = ? AND sid != ?")
-    .run(userId, exceptSid || '');
+  return db.run("DELETE FROM sessions WHERE (user_id = ? OR (sess->>'userId')::int = ?) AND sid != ?", [userId, userId, exceptSid || '']);
 }
 
 // ---- CSRF simples por sessão ----
@@ -93,7 +90,7 @@ function csrf(req, res, next) {
   next();
 }
 
-// ---- Limite de tentativas de login ----
+// ---- Limite de tentativas de login (por instância) ----
 const attempts = new Map();
 function loginLimiter(req, res, next) {
   const key = req.ip;

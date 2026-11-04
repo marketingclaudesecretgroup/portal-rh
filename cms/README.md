@@ -1,99 +1,121 @@
 # Comunica Secret — CMS do Portal de Gente & Gestão
 
-CMS simples em **Node.js + SQLite** para o portal do RH da Secret Outlet. O site público já vem com as páginas que vocês criaram (Início, Onboarding, Desenvolvimento, Treinamentos, NR1, Benefícios, Calendário, Gente & Gestão e Políticas), e o RH edita tudo pelo painel em `/admin`.
+CMS em **Node.js (Express)** para o portal do RH da Secret Outlet, pronto para rodar na **Vercel** com **Supabase**:
+
+- **Supabase Postgres** guarda páginas, comunicados, usuários, configurações e sessões de login.
+- **Supabase Storage** guarda imagens e PDFs (o navegador envia direto ao Storage, sem passar pelo limite de 4,5 MB da Vercel).
+- **Vercel** roda o site e o painel.
+
+Na primeira execução, o sistema cria as tabelas e o conteúdo inicial sozinho (Início, Onboarding, Desenvolvimento, Treinamentos, NR1, Benefícios, Calendário, Gente & Gestão, Políticas e 4 comunicados de exemplo).
 
 ## O que o painel faz
 
-- **Páginas**: criar, editar, duplicar, excluir, rascunho/publicada, posição no menu e submenu, página inicial.
-- **Editor de blocos**: monte a página empilhando blocos com o visual do portal — Banner principal, Introdução, Acesso rápido, Cards com ícone, Passo a passo, Em destaque, Faixa de destaque, Agenda, Últimos comunicados, Perguntas frequentes, Ficha de informações, Texto livre, Incorporar (Google Agenda/Drive/Forms/vídeo), Fale com o RH e Aviso. Cada bloco pode ser reordenado, duplicado ou ocultado.
-- **Comunicados (artigos)**: texto com editor, capa, categoria, resumo, fixar no topo e agendamento por data. Aparecem em `/comunicados` e no bloco "Últimos comunicados".
-- **Mídia**: envio de imagens e PDFs (até 10 MB).
-- **Usuários**: perfis **Administrador** (acesso total) e **Editor** (páginas, comunicados e mídia).
+- **Páginas**: criar, editar, duplicar, excluir, rascunho/publicada, menu e submenu, página inicial.
+- **Editor de blocos**: Banner principal, Introdução, Acesso rápido, Cards com ícone, Passo a passo, Em destaque, Faixa de destaque, Agenda, Últimos comunicados, Perguntas frequentes, Ficha de informações, Texto livre, Incorporar (Google Agenda/Drive/Forms/vídeo), Fale com o RH e Aviso.
+- **Comunicados**: editor de texto, capa, categoria, resumo, fixar no topo e agendamento.
+- **Mídia**: imagens e PDFs até 10 MB.
+- **Usuários**: **Administrador** (tudo) e **Editor** (páginas, comunicados e mídia).
 - **Configurações**: logotipo, contatos do RH, WhatsApp, redes sociais e rodapé.
 
-## Rodar no computador (para testar)
+---
 
-1. Instale o **Node.js 22 ou 24** (https://nodejs.org). A execução local foi validada com Node.js 24.
-2. Abra o terminal na pasta `cms` e rode (se estiver na raiz do projeto, execute `cd cms` antes):
+## Passo a passo: Supabase + Vercel
+
+### 1. Criar o projeto no Supabase
+
+1. Em https://supabase.com, crie um projeto (região sugerida: **South America (São Paulo)**). Anote a senha do banco.
+2. Pegue a **string de conexão**: botão **Connect** no topo do projeto → **Transaction pooler** (porta **6543**). Troque `[YOUR-PASSWORD]` pela senha do banco. Essa é a `DATABASE_URL`.
+3. Pegue as chaves em **Project Settings → API Keys**:
+   - **Project URL** → `SUPABASE_URL`
+   - chave **service_role** (secreta) → `SUPABASE_SERVICE_ROLE_KEY`
+
+   A service_role dá acesso total: cadastre só na Vercel, nunca coloque em código ou mande por e-mail/WhatsApp.
+
+Não precisa criar tabelas nem bucket: o sistema cria tudo no primeiro acesso (o bucket público se chama `portal-rh`).
+
+### 2. Subir o código para o GitHub
+
+O repositório é `marketingclaudesecretgroup/portal-rh` (o CMS fica na pasta `cms`). O `.gitignore` já impede o envio de `node_modules`, `data` e `.env`.
+
+### 3. Importar na Vercel
+
+1. **Add New → Project** → escolha o repositório.
+2. **Root Directory**: `cms` (clique em *Edit* e selecione a pasta). **Application Preset**: **Other**. (O arquivo `vercel.json` já configura tudo; não precisa preencher build nem output.)
+3. Em **Environment Variables**, cadastre:
+
+| Nome | Valor |
+|---|---|
+| `DATABASE_URL` | string do Transaction pooler (porta 6543) |
+| `SUPABASE_URL` | `https://xxxx.supabase.co` |
+| `SUPABASE_SERVICE_ROLE_KEY` | chave service_role |
+| `SESSION_SECRET` | um texto longo e aleatório (40+ caracteres) |
+
+4. **Deploy**. Ao terminar, abra `https://seu-projeto.vercel.app/admin` e crie a conta de administrador.
+
+Para usar um endereço próprio (ex.: `rh.secretoutlet.com.br`), vá em **Settings → Domains** na Vercel.
+
+---
+
+## Rodar no computador (opcional)
+
+1. Instale o **Node.js 20+**.
+2. Copie `.env.example` para `.env` e preencha (pode usar o mesmo Supabase).
+3. No terminal, dentro desta pasta:
    ```
-   npm ci
+   npm install
    npm start
    ```
-3. Acesse http://localhost:3000. Em http://localhost:3000/admin, crie a primeira conta de administrador.
+4. Acesse http://localhost:3000 e http://localhost:3000/admin.
 
-O banco (`data/portal.db`) e os arquivos enviados (`data/uploads/`) ficam na pasta `data`. **Faça backup dessa pasta**: ela guarda todo o conteúdo.
+Sem `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY`, os arquivos enviados ficam na pasta local `data/uploads` (útil só para testes).
 
-## Testes automatizados
+## Testes
 
-Na pasta `cms`, execute `npm test` para os testes de integração. Eles iniciam um servidor em porta livre e usam um banco temporário, sem alterar `data/portal.db`.
-
-Para testar a interface no Chromium:
+Os testes criam um *schema* temporário no Postgres e apagam ao final; os dados reais não são tocados.
+Defina `TEST_DATABASE_URL` (um Postgres local ou a conexão **Direct**/**Session pooler** do Supabase — não use a de produção se puder evitar) e rode:
 
 ```
+npm test                      # 39 testes de integração
 npx playwright install chromium
-npm run test:ui
+npm run test:ui               # 8 testes no navegador
 ```
 
-Se o Chrome já estiver instalado, pode usá-lo sem baixar o Chromium. No PowerShell:
-
-```powershell
-$env:PLAYWRIGHT_CHANNEL = 'chrome'
-npm run test:ui
-```
-
-Os testes de interface também usam dados temporários e não acessam contas nem sessões pessoais do navegador. Consulte [TESTES.md](TESTES.md) para os resultados e as correções verificadas.
-
-## Publicar
-
-Qualquer serviço que rode Node.js e tenha **disco persistente** serve.
-
-**Render / Railway**
-- Build: `npm install` · Start: `npm start`
-- Crie um disco persistente (ex.: montado em `/var/data`) e defina `DATA_DIR=/var/data`.
-- Defina `COOKIE_SECURE=true` (o site roda em https).
-
-**VPS / servidor próprio**
-```
-npm install --omit=dev
-DATA_DIR=/srv/comunica-secret PORT=3000 COOKIE_SECURE=true npx pm2 start server.js --name comunica-secret
-```
-Coloque um Nginx ou Caddy na frente com HTTPS.
-
-### Variáveis de ambiente
-
-| Variável | Para quê | Padrão |
-|---|---|---|
-| `PORT` | Porta do servidor | `3000` |
-| `DATA_DIR` | Pasta do banco e dos uploads | `./data` |
-| `COOKIE_SECURE` | `true` quando o site usa https | `false` |
-| `SESSION_SECRET` | Segredo das sessões (opcional; gerado automaticamente) | — |
+No Windows (PowerShell), para usar o Chrome instalado: `$env:PLAYWRIGHT_CHANNEL="chrome"; npm run test:ui`.
+Resultados e correções em [TESTES.md](TESTES.md).
 
 ## Esqueceu a senha?
 
-Outro administrador redefine em **Usuários**. Se não houver nenhum, rode no servidor:
+Outro administrador redefine em **Usuários**. Se não houver nenhum, com o `.env` preenchido rode:
 ```
 npm run reset-password -- rh@secretoutlet.com.br NovaSenha123
 ```
 
+## Backup
+
+Tudo fica no Supabase. Os planos pagos fazem backup diário automático; no gratuito, exporte de vez em quando em **Database → Backups** ou com `pg_dump`. Projetos gratuitos do Supabase são pausados após alguns dias sem acesso — reative pelo painel se isso acontecer.
+
 ## Dicas de uso
 
-- Os links dos botões aceitam páginas do portal (`/beneficios`), endereços externos (`https://…`), e-mail (`mailto:`) e âncoras para seções da mesma página (`#secao-3` = 3º bloco).
-- Para o Google Agenda: em Configurações da agenda → Integrar agenda → copie o endereço que aparece em `src="…"` e cole no bloco **Incorporar**.
-- Os comunicados e alguns links iniciais são **exemplos**: troque pelas informações reais antes de divulgar.
-- O portal está público para quem tiver o endereço (e fora do Google). Se ele precisar ser restrito aos colaboradores, publique atrás da rede/VPN da empresa ou peça a evolução "login para colaboradores".
+- Links dos botões aceitam páginas do portal (`/beneficios`), endereços externos (`https://…`), e-mail (`mailto:`) e âncoras da mesma página (`#secao-3` = 3º bloco).
+- Google Agenda: Configurações da agenda → Integrar agenda → copie o endereço de `src="…"` e cole no bloco **Incorporar**.
+- Os comunicados e alguns links iniciais são **exemplos**: troque antes de divulgar.
+- O portal é público para quem tiver o endereço. Para restringir aos colaboradores, é possível adicionar um login para colaboradores.
 
 ## Estrutura
 
 ```
-server.js              inicialização
-src/db.js              banco SQLite e configurações
+app.js                 aplicação Express
+server.js              execução local (npm start)
+api/index.js           entrada na Vercel
+vercel.json            configuração da Vercel
+src/db.js              conexão Postgres, tabelas e configurações
+src/storage.js         Supabase Storage (ou disco local)
 src/blocks.js          definição dos blocos (o editor é gerado daqui)
 src/icons.js           biblioteca de ícones
 src/seed.js            conteúdo inicial
-src/routes/public.js   site público
-src/routes/admin.js    painel
-views/blocks/          visual de cada bloco
-public/css, public/js  estilos e scripts
+src/routes/            site público e painel
+views/                 templates (site, painel e blocos)
+public/                CSS e JavaScript
 ```
 
 Para criar um novo tipo de bloco: adicione a definição em `src/blocks.js` e um template `views/blocks/<tipo>.ejs`.

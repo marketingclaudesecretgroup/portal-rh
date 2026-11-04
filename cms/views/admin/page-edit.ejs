@@ -59,7 +59,7 @@
 <script>
   window.BLOCK_SCHEMA = <%- JSON.stringify(schema).replace(/</g, '\\u003c') %>;
   window.ICONS = <%- JSON.stringify(icons).replace(/</g, '\\u003c') %>;
-  window.INITIAL_BLOCKS = <%- (page.blocks || '[]').replace(/</g, '\\u003c') %>;
+  window.INITIAL_BLOCKS = <%- blocksJson.replace(/</g, '\\u003c') %>;
 </script>
 <script src="/vendor/quill/quill.js"></script>
 <script src="/static/js/blocks-editor.js"></script>
