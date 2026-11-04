@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <% if (typeof useEditor !== 'undefined' && useEditor) { %><link rel="stylesheet" href="/vendor/quill/quill.snow.css"><% } %>
-  <link rel="stylesheet" href="/static/css/admin.css">
+  <link rel="stylesheet" href="/static/css/admin.css?v=<%= adminAssetVersion %>">
 </head>
 <body class="admin">
 <% if (currentUser) { var nav = [

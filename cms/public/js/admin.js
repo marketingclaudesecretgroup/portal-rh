@@ -44,9 +44,12 @@
   function postJSON(url, data) {
     return requestJSON(url, { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF, Accept: 'application/json' } });
   }
-  function uploadFile(file) {
+  function uploadFile(file, onProgress) {
+    function progress(message) { if (onProgress) onProgress(message); }
     var meta = { name: file.name, type: file.type, size: file.size };
+    progress('Preparando envio…');
     return postJSON('/admin/midia/assinar', meta).then(function (sig) {
+      progress('Enviando arquivo…');
       if (sig.mode === 'supabase') {
         // Mesmo formato do uploadToSignedUrl do SDK: metadados antes do arquivo.
         // O navegador define o Content-Type com o boundary do multipart.
@@ -54,13 +57,14 @@
         signedBody.append('cacheControl', '31536000');
         signedBody.append('', file, file.name);
         return requestJSON(sig.signedUrl, { method: 'PUT', body: signedBody, headers: { 'x-upsert': 'false' } }, 120000)
-          .then(function () { meta.path = sig.path; return postJSON('/admin/midia/confirmar', meta); });
+          .then(function () { progress('Finalizando imagem…'); meta.path = sig.path; return postJSON('/admin/midia/confirmar', meta); });
       }
       var fd = new FormData();
       fd.append('file', file);
       return requestJSON('/admin/midia/enviar', { method: 'POST', body: fd, headers: { 'X-CSRF-Token': CSRF, Accept: 'application/json' } }, 120000);
     }).then(function (item) {
       if (!item || typeof item.url !== 'string' || !item.url) throw new Error('O arquivo foi enviado, mas não foi possível obter seu endereço. Tente novamente.');
+      progress('Envio concluído.');
       return item;
     });
   }
@@ -69,21 +73,44 @@
   // ---------- Modal de mídia ----------
   var modal = document.getElementById('media-modal');
   var pickCallback = null;
+  var modalUploading = false;
   function esc(s) { return String(s || '').replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function uploadIndicator(container, file, position) {
+    var previewUrl = file.type.indexOf('image/') === 0 ? URL.createObjectURL(file) : '';
+    container.innerHTML = '<div class="upload-progress" role="status" aria-live="polite" aria-atomic="true">' +
+      (previewUrl ? '<img class="upload-progress__preview" src="' + esc(previewUrl) + '" alt="">' : '') +
+      '<div class="upload-progress__body"><strong class="upload-progress__phase"></strong>' +
+      '<span class="upload-progress__name">' + esc((position ? position + ' · ' : '') + file.name) + '</span>' +
+      '<div class="upload-progress__bar" role="progressbar" aria-label="Envio em andamento"></div>' +
+      '<span class="muted small">Aguarde a conclusão do envio.</span></div>' +
+      '<span class="upload-progress__spinner" aria-hidden="true"></span></div>';
+    var phase = container.querySelector('.upload-progress__phase');
+    return {
+      update: function (message) { phase.textContent = message; },
+      dispose: function () { if (previewUrl) URL.revokeObjectURL(previewUrl); }
+    };
+  }
+  function uploadBusy(input, busy) {
+    input.disabled = busy;
+    var label = input.closest('label');
+    if (label) { label.classList.toggle('is-uploading', busy); label.setAttribute('aria-disabled', String(busy)); }
+  }
   function loadGrid() {
     var grid = modal.querySelector('[data-grid]');
     grid.innerHTML = '<p class="muted">Carregando…</p>';
     return requestJSON('/admin/midia.json', { headers: { Accept: 'application/json' } }).then(function (items) {
+      if (modalUploading) return;
       if (!Array.isArray(items)) throw new Error('Não foi possível carregar a biblioteca de imagens.');
       if (!items.length) { grid.innerHTML = '<p class="muted">Nenhum arquivo ainda. Envie o primeiro pelo botão acima.</p>'; return; }
       grid.innerHTML = items.map(function (m) {
         var thumb = m.mime === 'application/pdf' ? '<span class="media-item__pdf">PDF</span>' : '<img src="' + esc(m.url) + '" alt="" loading="lazy">';
         return '<button type="button" class="media-item media-item--pick" data-url="' + esc(m.url) + '">' + thumb + '<span>' + esc(m.original_name) + '</span></button>';
       }).join('');
-    }).catch(function (error) { grid.textContent = errorMessage(error, 'Não foi possível carregar as imagens. Tente abrir a biblioteca novamente.'); });
+    }).catch(function (error) { if (!modalUploading) grid.textContent = errorMessage(error, 'Não foi possível carregar as imagens. Tente abrir a biblioteca novamente.'); });
   }
   window.openMediaPicker = function (cb) {
     if (!modal) return;
+    if (modalUploading) { modal.hidden = false; return; }
     pickCallback = cb;
     modal.hidden = false;
     loadGrid();
@@ -102,12 +129,15 @@
   if (modal) {
     modal.querySelector('[data-upload]').addEventListener('change', function (e) {
       var f = e.target.files[0];
-      if (!f) return;
+      if (!f || modalUploading) return;
       var grid = modal.querySelector('[data-grid]');
-      grid.innerHTML = '<p class="muted">Enviando “' + esc(f.name) + '”…</p>';
-      uploadFile(f).then(function (j) { if (pickCallback) pickCallback(j.url); closeModal(modal); })
+      modalUploading = true;
+      uploadBusy(e.target, true);
+      modal.setAttribute('aria-busy', 'true');
+      var indicator = uploadIndicator(grid, f);
+      uploadFile(f, indicator.update).then(function (j) { if (pickCallback) pickCallback(j.url); closeModal(modal); })
         .catch(function (err) { grid.textContent = errorMessage(err, 'Não foi possível enviar o arquivo. Tente novamente.'); alert(grid.textContent); })
-        .finally(function () { e.target.value = ''; });
+        .finally(function () { indicator.dispose(); modalUploading = false; modal.setAttribute('aria-busy', 'false'); uploadBusy(e.target, false); e.target.value = ''; });
     });
   }
 
@@ -131,11 +161,20 @@
   // ---------- Página de mídia ----------
   var up = document.getElementById('media-upload');
   if (up) up.addEventListener('change', function () {
+    if (up.disabled || !up.files.length) return;
     var files = Array.from(up.files), status = document.getElementById('upload-status'), done = 0;
-    status.textContent = 'Enviando ' + files.length + ' arquivo(s)…';
-    files.reduce(function (p, f) {
-      return p.then(function () { return uploadFile(f).then(function () { done++; }).catch(function (e) { alert(f.name + ': ' + e.message); }); });
-    }, Promise.resolve()).then(function () { status.textContent = done + ' arquivo(s) enviado(s).'; location.reload(); });
+    uploadBusy(up, true);
+    status.setAttribute('aria-busy', 'true');
+    files.reduce(function (p, f, index) {
+      return p.then(function () {
+        var indicator = uploadIndicator(status, f, (index + 1) + ' de ' + files.length);
+        return uploadFile(f, indicator.update).then(function () { done++; })
+          .catch(function (e) { alert(f.name + ': ' + e.message); }).finally(indicator.dispose);
+      });
+    }, Promise.resolve()).then(function () {
+      status.textContent = done + ' de ' + files.length + ' arquivo(s) enviado(s).';
+      if (done) location.reload();
+    }).finally(function () { status.setAttribute('aria-busy', 'false'); uploadBusy(up, false); up.value = ''; });
   });
   document.querySelectorAll('[data-copy]').forEach(function (b) {
     b.addEventListener('click', function () {

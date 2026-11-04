@@ -2,7 +2,7 @@
 <div class="content">
   <div class="page-title"><div><h1>Mídia</h1><p class="muted">Imagens e PDFs usados no portal. Clique em um arquivo para copiar o endereço.</p></div>
     <label class="btn btn--primary"><input type="file" accept="image/*,application/pdf" multiple hidden id="media-upload">Enviar arquivos</label></div>
-  <p class="muted small" id="upload-status"></p>
+  <div id="upload-status" role="status" aria-live="polite"></div>
   <% if (!media.length) { %><div class="panel"><p class="muted">Nenhum arquivo enviado ainda.</p></div><% } %>
   <div class="media-grid">
     <% media.forEach(function(m){ %>

@@ -189,6 +189,19 @@ a.stat:hover { border-color: var(--gold); }
 .modal__head h2 { margin: 0; font-size: 20px; }
 .modal__close { width: 36px; height: 36px; border: 0; background: #f1ede6; border-radius: 50%; font-size: 22px; cursor: pointer; }
 .modal__tools { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.btn.is-uploading { opacity: .55; cursor: wait; }
+.upload-progress { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; width: 100%; box-sizing: border-box; padding: 22px; background: #faf7f1; border: 1px solid var(--border); border-radius: 12px; }
+.upload-progress__preview { width: 64px; height: 64px; flex: 0 0 64px; object-fit: cover; border-radius: 8px; background: #eee9e1; }
+.upload-progress__body { flex: 1; min-width: 0; display: grid; gap: 7px; }
+.upload-progress__phase { font-size: 16px; color: var(--text); }
+.upload-progress__name { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.upload-progress__spinner { flex: 0 0 24px; width: 24px; height: 24px; box-sizing: border-box; border: 3px solid #e8dfd0; border-top-color: var(--gold-dark); border-radius: 50%; animation: upload-spin .8s linear infinite; }
+.upload-progress__bar { height: 5px; overflow: hidden; position: relative; border-radius: 4px; background: #e8dfd0; margin: 3px 0; }
+.upload-progress__bar::after { content: ''; position: absolute; inset: 0 auto 0 -40%; width: 40%; border-radius: inherit; background: var(--gold-dark); animation: upload-slide 1.4s ease-in-out infinite; }
+@keyframes upload-spin { to { transform: rotate(360deg); } }
+@keyframes upload-slide { to { left: 100%; } }
+@media (max-width: 480px) { .upload-progress { gap: 10px; padding: 16px 12px; } .upload-progress__preview { width: 44px; height: 44px; flex-basis: 44px; } }
+@media (prefers-reduced-motion: reduce) { .upload-progress__spinner, .upload-progress__bar::after { animation: none; } .upload-progress__bar::after { left: 30%; } }
 .library { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
 .lib-item { display: flex; flex-direction: column; gap: 4px; text-align: left; padding: 16px; border: 1px solid var(--border); border-radius: 10px; background: #fff; cursor: pointer; font: inherit; }
 .lib-item:hover { border-color: var(--gold); background: #faf6ef; }

@@ -1,5 +1,9 @@
 # Verificação do Portal RH
 
+## Indicador de envio (04/11/2026)
+
+`npm run test:uploads` aprovou **20 testes** após incluir o indicador animado, a prévia local e as etapas de preparação, envio e finalização. Os testes no Chrome verificam bloqueio de envios duplicados, recuperação após falhas, layout de 390 pixels, upload pela biblioteca de mídia e uma resposta atrasada da biblioteca que antes podia apagar o estado de envio. A suíte de runtime manteve **4 testes aprovados**. CSS e JavaScript usam uma versão conjunta para atualizar o cache do painel.
+
 ## Envio de imagens (04/11/2026)
 
 `npm run test:uploads` aprovou **15 testes**, com Storage HTTP simulado e Chrome headless, sem dados ou credenciais de produção. Cobrem URL assinada pelo SDK real, criação de bucket ausente, credenciais recusadas, bucket privado, confirmação, exclusão com falha, envio multipart com o nome original, prévia da imagem no editor, erros aninhados, limite de espera, erro na biblioteca e envio local de desenvolvimento.
