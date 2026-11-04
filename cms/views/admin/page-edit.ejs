@@ -1,0 +1,66 @@
+<%- include('_head', { useEditor: true }) %>
+<div class="content content--wide">
+  <form method="post" action="/admin/paginas/<%= page.id %>" id="page-form" class="editor-layout">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="blocks" id="blocks-input">
+    <div class="editor-main">
+      <div class="page-title">
+        <div><a class="muted small" href="/admin/paginas">← Páginas</a><h1><%= page.id ? page.title : 'Nova página' %></h1></div>
+        <% if (page.id) { %><a class="btn" href="<%= pageUrl(page) %>" target="_blank" rel="noopener">Visualizar ↗</a><% } %>
+      </div>
+      <label class="field field--title"><span>Título da página</span><input name="title" value="<%= page.title %>" required placeholder="Ex.: Benefícios"></label>
+      <div class="blocks-head">
+        <h2>Conteúdo da página</h2>
+        <div class="blocks-head__tools"><button type="button" class="btn btn--sm btn--ghost" data-collapse-all>Recolher todos</button></div>
+      </div>
+      <div id="blocks" class="blocks"></div>
+      <div class="add-block">
+        <button type="button" class="btn btn--primary" data-open-library>+ Adicionar bloco</button>
+      </div>
+    </div>
+    <aside class="editor-side">
+      <div class="panel sticky">
+        <h2>Publicação</h2>
+        <label class="field"><span>Status</span>
+          <select name="status"><option value="draft" <%= page.status!=='published'?'selected':'' %>>Rascunho (só o RH vê)</option><option value="published" <%= page.status==='published'?'selected':'' %>>Publicada</option></select>
+        </label>
+        <button class="btn btn--primary btn--block" type="submit">Salvar página</button>
+        <p class="muted small" id="dirty-msg" hidden>Há alterações não salvas.</p>
+        <hr>
+        <h2>Menu e endereço</h2>
+        <label class="field"><span>Endereço (URL)</span><div class="input-prefix"><span>/</span><input name="slug" value="<%= page.slug %>" placeholder="gerado pelo título"></div></label>
+        <label class="check"><input type="checkbox" name="show_in_menu" <%= page.show_in_menu ? 'checked' : '' %>> Mostrar no menu</label>
+        <label class="field"><span>Nome no menu (opcional)</span><input name="menu_label" value="<%= page.menu_label || '' %>" placeholder="<%= page.title || 'Igual ao título' %>"></label>
+        <label class="field"><span>Página-mãe (submenu)</span>
+          <select name="parent_id"><option value="">— Nenhuma (menu principal) —</option>
+            <% parents.forEach(function(p){ %><option value="<%= p.id %>" <%= page.parent_id===p.id?'selected':'' %>><%= p.title %></option><% }) %>
+          </select>
+        </label>
+        <label class="field"><span>Ordem no menu</span><input type="number" name="menu_order" value="<%= page.menu_order %>"></label>
+        <% if (currentUser.role === 'admin' && page.id !== (parseInt(settings.home_page_id,10)||0)) { %>
+        <label class="check"><input type="checkbox" name="set_home"> Usar como página inicial</label>
+        <% } %>
+        <label class="field"><span>Descrição curta (para buscadores e prévias)</span><textarea name="meta_description" rows="3"><%= page.meta_description || '' %></textarea></label>
+      </div>
+    </aside>
+  </form>
+</div>
+
+<div class="modal" id="library-modal" hidden>
+  <div class="modal__box modal__box--wide" role="dialog" aria-modal="true" aria-labelledby="lib-title">
+    <div class="modal__head"><h2 id="lib-title">Escolha um bloco</h2><button type="button" class="modal__close" data-close aria-label="Fechar">×</button></div>
+    <div class="library" id="library"></div>
+  </div>
+</div>
+
+<datalist id="link-suggestions">
+  <% links.forEach(function(l){ %><option value="<%= l.url %>"><%= l.label %></option><% }) %>
+</datalist>
+<script>
+  window.BLOCK_SCHEMA = <%- JSON.stringify(schema).replace(/</g, '\\u003c') %>;
+  window.ICONS = <%- JSON.stringify(icons).replace(/</g, '\\u003c') %>;
+  window.INITIAL_BLOCKS = <%- (page.blocks || '[]').replace(/</g, '\\u003c') %>;
+</script>
+<script src="/vendor/quill/quill.js"></script>
+<script src="/static/js/blocks-editor.js"></script>
+<%- include('_foot') %>

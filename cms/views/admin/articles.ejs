@@ -1,0 +1,29 @@
+<%- include('_head') %>
+<div class="content">
+  <div class="page-title"><div><h1>Comunicados</h1><p class="muted">Notícias, avisos e artigos. Aparecem em /comunicados e nos blocos "Últimos comunicados".</p></div><a class="btn btn--primary" href="/admin/comunicados/novo">+ Novo comunicado</a></div>
+  <form class="search" method="get"><input name="q" value="<%= q %>" placeholder="Buscar por título ou categoria"><button class="btn" type="submit">Buscar</button></form>
+  <div class="panel panel--flush">
+    <% if (!articles.length) { %><p class="muted pad">Nenhum comunicado encontrado.</p><% } else { %>
+    <table class="table">
+      <thead><tr><th>Título</th><th>Categoria</th><th>Status</th><th>Publicação</th><th>Autor</th><th></th></tr></thead>
+      <tbody>
+      <% articles.forEach(function(a){ var scheduled = a.status==='published' && a.published_at > now; %>
+        <tr>
+          <td><a class="strong" href="/admin/comunicados/<%= a.id %>"><%= a.title %></a><% if (a.featured) { %> <span class="badge badge--home">Fixado</span><% } %></td>
+          <td><%= a.category || '—' %></td>
+          <td><span class="badge badge--<%= scheduled ? 'scheduled' : a.status %>"><%= scheduled ? 'Agendado' : (a.status==='published'?'Publicado':'Rascunho') %></span></td>
+          <td class="muted small"><%= fmtDate(a.published_at, true) %></td>
+          <td class="muted small"><%= a.author || '—' %></td>
+          <td class="actions">
+            <a class="btn btn--sm" href="/admin/comunicados/<%= a.id %>">Editar</a>
+            <a class="btn btn--sm btn--ghost" href="/comunicados/<%= a.slug %>" target="_blank" rel="noopener">Ver</a>
+            <form method="post" action="/admin/comunicados/<%= a.id %>/excluir" data-confirm="Excluir o comunicado “<%= a.title %>”?"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn--sm btn--danger" type="submit">Excluir</button></form>
+          </td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
+    <% } %>
+  </div>
+</div>
+<%- include('_foot') %>

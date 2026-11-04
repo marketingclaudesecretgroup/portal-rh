@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Benefícios Secret Group</title>
+  <style>
+    :root {
+      --white: #fff;
+      --soft: #f5f4f1;
+      --text: #171717;
+      --muted: #66635f;
+      --gold: #b7863f;
+      --gold-dark: #946a30;
+      --sage: #687355;
+      --border: #e4e1dc;
+      --shadow: 0 8px 24px rgba(23, 23, 23, .055);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    html, body {
+      margin: 0;
+      background: var(--white);
+      color: var(--text);
+      font-family: Inter, "Google Sans", Arial, sans-serif;
+    }
+
+    .benefits {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .section { padding: 46px 28px; }
+    .section--soft { background: var(--soft); }
+
+    .section-title {
+      margin: 0 0 30px;
+      font-size: clamp(25px, 3vw, 34px);
+      line-height: 1.2;
+      letter-spacing: -.025em;
+      text-align: center;
+    }
+
+    .section-title::after {
+      display: block;
+      width: 44px;
+      height: 2px;
+      margin: 12px auto 0;
+      background: var(--gold);
+      content: "";
+    }
+
+    .icon {
+      display: grid;
+      width: 52px;
+      height: 52px;
+      flex: 0 0 auto;
+      color: var(--gold);
+      place-items: center;
+    }
+
+    .icon svg {
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.65;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .category-card {
+      display: grid;
+      min-height: 245px;
+      padding: 30px;
+      grid-template-columns: 76px minmax(0, 1fr);
+      gap: 22px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      transition: transform 160ms ease, border-color 160ms ease,
+        box-shadow 160ms ease;
+    }
+
+    .category-card:hover {
+      border-color: rgba(183, 134, 63, .55);
+      box-shadow: 0 14px 32px rgba(23, 23, 23, .09);
+      transform: translateY(-3px);
+    }
+
+    .category-card__title {
+      margin: 0 0 13px;
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    .category-card__list {
+      margin: 0 0 20px;
+      padding-left: 19px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .text-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gold-dark);
+      font-size: 14px;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .text-link::after { font-size: 19px; content: "→"; }
+    .text-link:hover { color: var(--text); text-decoration: underline; }
+
+    .featured-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .featured-card {
+      min-height: 260px;
+      padding: 26px 22px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--white);
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .featured-card .icon { margin: 0 auto 15px; }
+    .featured-card:nth-child(1) .icon,
+    .featured-card:nth-child(3) .icon { color: var(--sage); }
+
+    .featured-card__title {
+      margin: 0 0 4px;
+      font-size: 19px;
+    }
+
+    .featured-card__tag {
+      margin: 0 0 14px;
+      color: var(--gold-dark);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+
+    .featured-card__text {
+      min-height: 66px;
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 40px;
+      padding: 10px 18px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--gold);
+      border-radius: 999px;
+      color: var(--gold-dark);
+      font-size: 13px;
+      font-weight: 750;
+      text-decoration: none;
+      transition: background-color 160ms ease, color 160ms ease;
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      background: var(--gold);
+      color: var(--white);
+      outline: none;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .step {
+      position: relative;
+      display: grid;
+      padding: 8px 32px;
+      grid-template-columns: 48px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .step + .step::before {
+      position: absolute;
+      top: 7px;
+      bottom: 7px;
+      left: 0;
+      width: 1px;
+      background: var(--border);
+      content: "";
+    }
+
+    .step__number {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      color: var(--gold-dark);
+      font-size: 16px;
+      place-items: center;
+    }
+
+    .step__title {
+      margin: 2px 0 7px;
+      font-size: 16px;
+    }
+
+    .step__text {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .faq {
+      max-width: 960px;
+      margin: 0 auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--white);
+    }
+
+    .faq details + details { border-top: 1px solid var(--border); }
+
+    .faq summary {
+      position: relative;
+      padding: 19px 56px 19px 22px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 750;
+      list-style: none;
+    }
+
+    .faq summary::-webkit-details-marker { display: none; }
+
+    .faq summary::after {
+      position: absolute;
+      top: 50%;
+      right: 22px;
+      color: var(--gold-dark);
+      font-size: 24px;
+      font-weight: 400;
+      content: "+";
+      transform: translateY(-50%);
+    }
+
+    .faq details[open] summary::after { content: "−"; }
+
+    .faq details[open] summary {
+      background: var(--soft);
+      color: var(--gold-dark);
+    }
+
+    .faq__answer {
+      margin: 0;
+      padding: 0 22px 20px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .notice {
+      margin: 0;
+      padding: 0 28px 34px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    @media (max-width: 820px) {
+      .category-grid,
+      .featured-grid { grid-template-columns: 1fr 1fr; }
+
+      .featured-card:last-child { grid-column: 1 / -1; }
+      .steps { grid-template-columns: 1fr; gap: 0; }
+      .step { padding: 22px 10px; }
+      .step + .step::before {
+        top: 0;
+        right: 10%;
+        bottom: auto;
+        left: 10%;
+        width: auto;
+        height: 1px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .section { padding: 38px 16px; }
+      .category-grid,
+      .featured-grid { grid-template-columns: 1fr; }
+      .featured-card:last-child { grid-column: auto; }
+      .category-card {
+        min-height: 0;
+        padding: 24px 20px;
+        grid-template-columns: 54px 1fr;
+        gap: 15px;
+      }
+      .category-card .icon { width: 48px; height: 48px; }
+      .category-card__title { font-size: 17px; }
+      .featured-card__text { min-height: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .category-card, .button { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="benefits">
+    <section class="section section--soft" aria-labelledby="benefits-title">
+      <h2 class="section-title" id="benefits-title">Seus benefícios</h2>
+      <div class="category-grid">
+        <article class="category-card">
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 42S6 31 6 17c0-6 4-10 10-10 4 0 7 2 8 6 1-4 4-6 8-6 6 0 10 4 10 10 0 14-18 25-18 25Z"/><path d="M7 25h10l3-7 6 14 4-7h11"/></svg></span>
+          <div><h3 class="category-card__title">Saúde e bem-estar</h3><ul class="category-card__list"><li>TotalPass</li><li>Plano de saúde</li><li>Plano odontológico</li><li>Vale-farmácia</li></ul></div>
+        </article>
+        <article class="category-card">
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M7 13h32a4 4 0 0 1 4 4v23H7a4 4 0 0 1-4-4V11a5 5 0 0 1 4-5h28"/><path d="M34 23h10v10H34a5 5 0 0 1 0-10Z"/><circle cx="36" cy="28" r="1"/></svg></span>
+          <div><h3 class="category-card__title">Financeiro e reconhecimento</h3><ul class="category-card__list"><li>Folha de pagamento</li><li>PLR</li><li>Programa de aceleração salarial</li><li>Campanhas de produtividade</li></ul></div>
+        </article>
+        <article class="category-card">
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="6" y="9" width="36" height="33" rx="4"/><path d="M15 5v8M33 5v8M6 18h36m-25 9 5 5 10-11"/></svg></span>
+          <div><h3 class="category-card__title">Ausências e descanso</h3><ul class="category-card__list"><li>Férias</li><li>Licença-maternidade</li><li>Licença médica</li><li>Feriados</li></ul></div>
+        </article>
+        <article class="category-card">
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M7 26h8l19 9V10L15 19H7v7ZM15 26l3 14h7l-4-12M39 17l5-3M39 28l5 3"/></svg></span>
+          <div><h3 class="category-card__title">Campanhas especiais</h3><ul class="category-card__list"><li>Indique um amigo</li><li>Campanhas e ações internas</li></ul></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="featured" aria-labelledby="featured-title">
+      <h2 class="section-title" id="featured-title">Benefícios em destaque</h2>
+      <div class="featured-grid">
+        <article class="featured-card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M5 31c10 1 15-5 18-16 6 8 12 12 20 14v9H5v-7Z"/><path d="m10 28 4 4m2-9 5 4m5-8 5 4"/></svg></span><h3 class="featured-card__title">TotalPass</h3><p class="featured-card__tag">SAÚDE E BEM-ESTAR</p><p class="featured-card__text">Acesse academias e atividades para cuidar da sua rotina.</p><a class="button" href="https://wa.me/5541984165836" target="_blank" rel="noopener noreferrer">Saiba como utilizar</a></article>
+        <article class="featured-card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="17" cy="16" r="7"/><circle cx="33" cy="18" r="6"/><path d="M4 42v-5c0-8 5-13 13-13s13 5 13 13v5M29 27c2-2 4-3 7-3 6 0 9 4 9 10v8H30"/></svg></span><h3 class="featured-card__title">Indique um amigo</h3><p class="featured-card__tag">RECONHECIMENTO</p><p class="featured-card__text">Indique talentos e acompanhe as regras da campanha vigente.</p><a class="button" href="https://wa.me/5541984165836" target="_blank" rel="noopener noreferrer">Ver regulamento</a></article>
+        <article class="featured-card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 5 40 11v11c0 10-6 17-16 21C14 39 8 32 8 22V11l16-6Z"/><path d="M20 16h8v6h6v8h-6v6h-8v-6h-6v-8h6v-6Z"/></svg></span><h3 class="featured-card__title">Plano de saúde</h3><p class="featured-card__tag">CUIDADO</p><p class="featured-card__text">Consulte elegibilidade, cobertura e orientações de uso.</p><a class="button" href="https://wa.me/5541984165836" target="_blank" rel="noopener noreferrer">Consultar informações</a></article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

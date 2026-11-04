@@ -1,0 +1,17 @@
+<% if (currentUser) { %>
+  </div>
+</div>
+<div class="modal" id="media-modal" hidden>
+  <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="media-modal-title">
+    <div class="modal__head"><h2 id="media-modal-title">Escolher imagem</h2><button type="button" class="modal__close" data-close aria-label="Fechar">×</button></div>
+    <div class="modal__tools">
+      <label class="btn btn--primary btn--sm"><input type="file" accept="image/*,application/pdf" hidden data-upload>Enviar do computador</label>
+      <span class="muted small">ou clique em um arquivo abaixo · JPG, PNG, WEBP, SVG, PDF até 10 MB</span>
+    </div>
+    <div class="media-grid media-grid--pick" data-grid><p class="muted">Carregando…</p></div>
+  </div>
+</div>
+<script src="/static/js/admin.js"></script>
+<% } %>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<%- include('_head') %>
+<div class="content">
+  <div class="page-title"><div><h1>Olá, <%= currentUser.name.split(' ')[0] %>!</h1><p class="muted">O que você quer atualizar hoje no portal?</p></div></div>
+  <div class="stats">
+    <a class="stat" href="/admin/paginas"><strong><%= stats.pages %></strong><span>Páginas</span></a>
+    <a class="stat" href="/admin/comunicados"><strong><%= stats.articles %></strong><span>Comunicados publicados</span></a>
+    <div class="stat"><strong><%= stats.drafts %></strong><span>Rascunhos</span></div>
+    <% if (currentUser.role === 'admin') { %><a class="stat" href="/admin/usuarios"><strong><%= stats.users %></strong><span>Usuários ativos</span></a><% } %>
+  </div>
+  <div class="quick-actions">
+    <a class="btn btn--primary" href="/admin/comunicados/novo">+ Novo comunicado</a>
+    <a class="btn" href="/admin/paginas/nova">+ Nova página</a>
+    <a class="btn" href="/admin/midia">Enviar imagens</a>
+  </div>
+  <div class="grid-2">
+    <section class="panel">
+      <h2>Páginas editadas recentemente</h2>
+      <ul class="list">
+        <% recentPages.forEach(function(p){ %><li><a href="/admin/paginas/<%= p.id %>"><%= p.title %></a><span class="badge badge--<%= p.status %>"><%= p.status==='published'?'Publicada':'Rascunho' %></span><small class="muted"><%= fmtDate(p.updated_at, true) %><%= p.editor ? ' · ' + p.editor : '' %></small></li><% }) %>
+      </ul>
+    </section>
+    <section class="panel">
+      <h2>Comunicados recentes</h2>
+      <% if (!recentArticles.length) { %><p class="muted">Nenhum comunicado ainda.</p><% } %>
+      <ul class="list">
+        <% recentArticles.forEach(function(a){ %><li><a href="/admin/comunicados/<%= a.id %>"><%= a.title %></a><span class="badge badge--<%= a.status %>"><%= a.status==='published'?'Publicado':'Rascunho' %></span><small class="muted"><%= fmtDate(a.published_at) %></small></li><% }) %>
+      </ul>
+    </section>
+  </div>
+</div>
+<%- include('_foot') %>

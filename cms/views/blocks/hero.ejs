@@ -1,0 +1,14 @@
+<section class="hero hero--<%= d.size %> <%= d.image ? '' : 'hero--noimg' %>" id="secao-<%= i+1 %>">
+  <% if (d.image) { %><img class="hero__img" src="<%= d.image %>" alt="" <%= i===0 ? '' : 'loading="lazy"' %>><% } %>
+  <div class="container hero__inner">
+    <% if (d.eyebrow) { %><p class="hero__eyebrow"><%= d.eyebrow %></p><% } %>
+    <% if (d.title) { %><<%= i===0 ? 'h1' : 'h2' %> class="hero__title"><%= d.title %></<%= i===0 ? 'h1' : 'h2' %>><% } %>
+    <% if (d.text) { %><p class="hero__text"><%= d.text %></p><% } %>
+    <% if (d.button1_label || d.button2_label) { %>
+    <div class="btn-row">
+      <% if (d.button1_label) { %><a class="btn btn--gold" href="<%= d.button1_url || '#' %>"<%- linkAttrs(d.button1_url) %>><%= d.button1_label %></a><% } %>
+      <% if (d.button2_label) { %><a class="btn btn--ghost" href="<%= d.button2_url || '#' %>"<%- linkAttrs(d.button2_url) %>><%= d.button2_label %></a><% } %>
+    </div>
+    <% } %>
+  </div>
+</section>

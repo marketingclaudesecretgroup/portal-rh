@@ -1,0 +1,15 @@
+<section class="section bg-<%= d.background %>" id="secao-<%= i+1 %>">
+  <div class="container">
+    <% if (d.title) { %><h2 class="section-title"><%= d.title %></h2><% } %>
+    <ol class="steps steps--<%= Math.min((d.items||[]).length, 4) %>">
+      <% (d.items||[]).forEach(function(it, n){ %>
+      <li class="step">
+        <span class="step__num"><%= String(n+1).padStart(2,'0') %></span>
+        <% if (it.icon) { %><span class="step__icon"><%- icon(it.icon) %></span><% } %>
+        <h3 class="step__title"><%= it.title %></h3>
+        <% if (it.text) { %><p class="step__text"><%= it.text %></p><% } %>
+      </li>
+      <% }) %>
+    </ol>
+  </div>
+</section>

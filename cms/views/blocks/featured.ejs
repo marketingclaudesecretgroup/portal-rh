@@ -1,0 +1,36 @@
+<section class="section bg-<%= d.background %>" id="secao-<%= i+1 %>">
+  <div class="container">
+    <% if (d.title) { %><h2 class="section-title section-title--left"><%= d.title %></h2><% } %>
+    <div class="featured <%= (d.items||[]).length ? '' : 'featured--single' %>">
+      <article class="featured__main">
+        <% if (d.main_image) { %><img src="<%= d.main_image %>" alt="" loading="lazy"><% } %>
+        <div class="featured__main-copy">
+          <% if (d.main_tag) { %><p class="eyebrow eyebrow--gold"><%= d.main_tag %></p><% } %>
+          <h3 class="featured__headline">
+            <% if (d.main_title) { %><span><%= d.main_title %></span><% } %>
+            <% if (d.main_highlight) { %><span class="gold"><%= d.main_highlight %></span><% } %>
+            <% if (d.main_after) { %><span class="featured__after"><%= d.main_after %></span><% } %>
+          </h3>
+          <% if (d.main_subtitle) { %><p class="featured__sub"><%= d.main_subtitle %></p><% } %>
+          <% if (d.main_text) { %><p class="featured__text"><%= d.main_text %></p><% } %>
+          <% if (d.main_button_label && d.main_url) { %><a class="btn btn--light" href="<%= d.main_url %>"<%- linkAttrs(d.main_url) %>><%= d.main_button_label %></a><% } %>
+        </div>
+      </article>
+      <% if ((d.items||[]).length) { %>
+      <div class="featured__side">
+        <% d.items.forEach(function(it){ %>
+        <article class="side-card <%= it.image ? '' : 'side-card--noimg' %>">
+          <div class="side-card__copy">
+            <% if (it.tag) { %><p class="eyebrow eyebrow--gold"><%= it.tag %></p><% } %>
+            <h3 class="side-card__title"><%= it.title %></h3>
+            <% if (it.text) { %><p class="side-card__text"><%= it.text %></p><% } %>
+            <% if (it.link_label && it.url) { %><a class="text-link" href="<%= it.url %>"<%- linkAttrs(it.url) %>><%= it.link_label %></a><% } %>
+          </div>
+          <% if (it.image) { %><img src="<%= it.image %>" alt="" loading="lazy"><% } %>
+        </article>
+        <% }) %>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</section>

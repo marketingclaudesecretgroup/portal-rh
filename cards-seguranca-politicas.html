@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Segurança e políticas</title>
+  <style>
+    :root {
+      --background: #f5f4f1;
+      --card: #ffffff;
+      --text: #171717;
+      --muted: #66635f;
+      --gold: #b7863f;
+      --gold-dark: #956a30;
+      --border: #e4e1dc;
+      --shadow: 0 8px 24px rgba(23, 23, 23, .055);
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--text);
+      font-family: Inter, "Google Sans", Arial, sans-serif;
+    }
+
+    .cards {
+      display: grid;
+      width: 100%;
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 14px;
+      gap: 16px;
+    }
+
+    .card {
+      position: relative;
+      display: grid;
+      min-height: 170px;
+      padding: 27px 28px;
+      grid-template-columns: 56px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      transition: border-color 160ms ease, box-shadow 160ms ease,
+        transform 160ms ease;
+    }
+
+    .card:hover {
+      border-color: rgba(183, 134, 63, .6);
+      box-shadow: 0 14px 32px rgba(23, 23, 23, .09);
+      transform: translateY(-3px);
+    }
+
+    .card__icon {
+      display: grid;
+      width: 52px;
+      height: 52px;
+      color: var(--gold);
+      place-items: center;
+    }
+
+    .card__icon svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .card__title {
+      margin: 0 0 9px;
+      font-size: 20px;
+      font-weight: 750;
+      line-height: 1.25;
+    }
+
+    .card__description {
+      max-width: 390px;
+      margin: 0 0 17px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .card__link {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--gold-dark);
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .card__link::after {
+      display: inline-block;
+      font-size: 20px;
+      font-weight: 400;
+      line-height: 1;
+      content: "→";
+      transition: transform 160ms ease;
+    }
+
+    .card__link:hover,
+    .card__link:focus-visible {
+      color: var(--text);
+      outline: none;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .card__link:hover::after,
+    .card__link:focus-visible::after {
+      transform: translateX(4px);
+    }
+
+    .card__full-link {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      border-radius: inherit;
+    }
+
+    .card__full-link:focus-visible {
+      outline: 3px solid rgba(183, 134, 63, .5);
+      outline-offset: -4px;
+    }
+
+    @media (max-width: 480px) {
+      .cards { padding: 10px; gap: 12px; }
+
+      .card {
+        min-height: 0;
+        padding: 22px 20px;
+        grid-template-columns: 46px minmax(0, 1fr);
+        gap: 15px;
+      }
+
+      .card__icon { width: 44px; height: 44px; }
+      .card__title { font-size: 17px; }
+      .card__description, .card__link { font-size: 14px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card, .card__link::after { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <section class="cards" aria-label="Conteúdos essenciais">
+    <article class="card">
+      <span class="card__icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48">
+          <path d="M24 5 40 11v11c0 10-6 17-16 21C14 39 8 32 8 22V11l16-6Z"/>
+          <path d="m16 24 5 5 11-12"/>
+        </svg>
+      </span>
+      <div>
+        <h2 class="card__title">Segurança e NR1</h2>
+        <p class="card__description">Prevenção, cuidado e ambiente de trabalho saudável.</p>
+        <a class="card__link" href="https://sites.google.com/secretoutlet.com.br/comunicasecret/desenvolvimento/nr1-saiba-mais" target="_blank" rel="noopener noreferrer">Acessar conteúdo</a>
+      </div>
+      <a class="card__full-link" href="https://sites.google.com/secretoutlet.com.br/comunicasecret/desenvolvimento/nr1-saiba-mais" target="_blank" rel="noopener noreferrer" aria-label="Acessar Segurança e NR1"></a>
+    </article>
+
+    <article class="card">
+      <span class="card__icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48">
+          <path d="M11 5h19l8 8v30H11V5Z"/>
+          <path d="M30 5v9h8M17 23h15M17 30h15M17 37h10"/>
+        </svg>
+      </span>
+      <div>
+        <h2 class="card__title">Políticas de Gente &amp; Gestão</h2>
+        <p class="card__description">Diretrizes essenciais para a nossa jornada.</p>
+        <a class="card__link" href="https://sites.google.com/secretoutlet.com.br/comunicasecret/gente-e-gestao/politicas" target="_blank" rel="noopener noreferrer">Conhecer políticas</a>
+      </div>
+      <a class="card__full-link" href="https://sites.google.com/secretoutlet.com.br/comunicasecret/gente-e-gestao/politicas" target="_blank" rel="noopener noreferrer" aria-label="Conhecer Políticas de Gente e Gestão"></a>
+    </article>
+  </section>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+  <title><%= title %> — Painel <%= settings.site_name %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <% if (typeof useEditor !== 'undefined' && useEditor) { %><link rel="stylesheet" href="/vendor/quill/quill.snow.css"><% } %>
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body class="admin">
+<% if (currentUser) { var nav = [
+  ['/admin', 'Painel', 'grafico'],
+  ['/admin/paginas', 'Páginas', 'documento'],
+  ['/admin/comunicados', 'Comunicados', 'megafone'],
+  ['/admin/midia', 'Mídia', 'estrela']
+]; if (currentUser.role === 'admin') { nav.push(['/admin/usuarios', 'Usuários', 'grupo']); nav.push(['/admin/configuracoes', 'Configurações', 'engrenagem']); } %>
+<div class="shell">
+  <aside class="side" id="side">
+    <a class="side__brand" href="/admin"><span class="side__mark">S</span><span><strong><%= settings.site_name %></strong><small>Painel de conteúdo</small></span></a>
+    <nav class="side__nav">
+      <% nav.forEach(function(n){ var active = n[0] === '/admin' ? (currentPath === '/admin' || currentPath === '/admin/') : currentPath.indexOf(n[0]) === 0; %>
+        <a href="<%= n[0] %>" class="<%= active ? 'is-active' : '' %>"><%- icon(n[2]) %><span><%= n[1] %></span></a>
+      <% }) %>
+    </nav>
+    <div class="side__foot">
+      <a href="/" target="_blank" rel="noopener" class="side__site"><%- icon('link') %><span>Ver o portal</span></a>
+      <a href="/admin/perfil" class="side__user"><strong><%= currentUser.name %></strong><small><%= currentUser.role === 'admin' ? 'Administrador' : 'Editor' %> · Meu perfil</small></a>
+      <form method="post" action="/admin/logout"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="side__logout" type="submit">Sair</button></form>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar"><button class="topbar__menu" type="button" onclick="document.getElementById('side').classList.toggle('is-open')" aria-label="Abrir menu">☰</button><span><%= settings.site_name %></span></header>
+    <% if (flash) { %><div class="flash flash--<%= flash.type %>" role="status"><%= flash.text %></div><% } %>
+<% } %>

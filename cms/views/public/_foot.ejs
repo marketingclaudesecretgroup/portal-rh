@@ -1,0 +1,38 @@
+</main>
+<footer class="site-footer">
+  <div class="container site-footer__grid">
+    <div>
+      <a class="brand brand--light" href="/">
+        <% if (settings.logo) { %><img src="<%= settings.logo %>" alt="<%= settings.site_name %>"><% } else { %>
+        <span class="brand__mark" aria-hidden="true">S</span><span class="brand__text"><strong>SECRET</strong><small>GROUP</small></span><% } %>
+      </a>
+      <p class="site-footer__name"><%= settings.site_name %><% if (settings.site_tagline) { %> • <%= settings.site_tagline %><% } %></p>
+      <p class="site-footer__about"><%= settings.footer_about %></p>
+    </div>
+    <div>
+      <h2 class="site-footer__title">Fale com o RH</h2>
+      <ul class="site-footer__contact">
+        <% if (settings.contact_email) { %><li><%- social('email') %><a href="mailto:<%= settings.contact_email %>"><%= settings.contact_email %></a></li><% } %>
+        <% if (settings.contact_phone) { %><li><%- social('phone') %><a href="tel:<%= settings.contact_phone.replace(/[^0-9+]/g,'') %>"><%= settings.contact_phone %></a></li><% } %>
+        <% if (settings.contact_city) { %><li><%- social('pin') %><span><%= settings.contact_city %></span></li><% } %>
+      </ul>
+    </div>
+    <% if (settings.instagram_url || settings.facebook_url || settings.linkedin_url) { %>
+    <div>
+      <h2 class="site-footer__title">Siga a Secret</h2>
+      <div class="site-footer__social">
+        <% if (settings.instagram_url) { %><a href="<%= settings.instagram_url %>" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><%- social('instagram') %></a><% } %>
+        <% if (settings.facebook_url) { %><a href="<%= settings.facebook_url %>" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><%- social('facebook') %></a><% } %>
+        <% if (settings.linkedin_url) { %><a href="<%= settings.linkedin_url %>" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><%- social('linkedin') %></a><% } %>
+      </div>
+    </div>
+    <% } %>
+  </div>
+  <div class="container site-footer__bottom">
+    <span>© <%= year %> <%= settings.copyright %></span>
+    <% if (settings.footer_link_url) { %><a href="<%= settings.footer_link_url %>"><%= settings.footer_link_label || settings.footer_link_url %></a><% } %>
+  </div>
+</footer>
+<script src="/static/js/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<section class="section bg-<%= d.background %>" id="secao-<%= i+1 %>">
+  <div class="container">
+    <% if (d.title) { %><h2 class="section-title"><%= d.title %></h2><% } %>
+    <% if (d.subtitle) { %><p class="section-sub"><%= d.subtitle %></p><% } %>
+    <div class="cards cards--<%= d.columns %> cards--<%= d.layout %>">
+      <% (d.items||[]).forEach(function(it){ %>
+      <article class="card">
+        <% if (it.icon) { %><span class="card__icon"><%- icon(it.icon) %></span><% } %>
+        <div class="card__body">
+          <% if (it.title) { %><h3 class="card__title"><%= it.title %></h3><% } %>
+          <% if (it.tag) { %><p class="eyebrow"><%= it.tag %></p><% } %>
+          <% if (it.text) { %><p class="card__text"><%= it.text %></p><% } %>
+          <% if (it.lines && it.lines.length) { %><ul class="card__list"><% it.lines.forEach(function(l){ %><li><%= l %></li><% }) %></ul><% } %>
+          <% if (it.button_label && it.url) { %>
+            <a class="<%= it.button_style === 'botao' ? 'btn btn--dark btn--sm' : 'text-link' %>" href="<%= it.url %>"<%- linkAttrs(it.url) %>><%= it.button_label %></a>
+          <% } %>
+        </div>
+      </article>
+      <% }) %>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,26 @@
+<%- include('_head') %>
+<div class="content">
+  <div class="page-title"><div><h1>Páginas</h1><p class="muted">Páginas do portal. As marcadas "no menu" aparecem no cabeçalho, na ordem definida.</p></div><a class="btn btn--primary" href="/admin/paginas/nova">+ Nova página</a></div>
+  <div class="panel panel--flush">
+    <table class="table">
+      <thead><tr><th>Título</th><th>Endereço</th><th>Menu</th><th>Status</th><th>Atualizada</th><th></th></tr></thead>
+      <tbody>
+      <% pages.forEach(function(p){ %>
+        <tr>
+          <td><a class="strong" href="/admin/paginas/<%= p.id %>"><%= p.parent_id ? '↳ ' : '' %><%= p.title %></a><% if (p.id === homeId) { %> <span class="badge badge--home">Página inicial</span><% } %></td>
+          <td><a class="muted" href="<%= pageUrl(p) %>" target="_blank" rel="noopener"><%= pageUrl(p) %></a></td>
+          <td><%= p.show_in_menu ? ('Sim · ordem ' + p.menu_order) : '—' %></td>
+          <td><span class="badge badge--<%= p.status %>"><%= p.status==='published'?'Publicada':'Rascunho' %></span></td>
+          <td class="muted small"><%= fmtDate(p.updated_at, true) %><%= p.editor ? '<br>' : '' %><%= p.editor || '' %></td>
+          <td class="actions">
+            <a class="btn btn--sm" href="/admin/paginas/<%= p.id %>">Editar</a>
+            <form method="post" action="/admin/paginas/<%= p.id %>/duplicar"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn--sm btn--ghost" type="submit">Duplicar</button></form>
+            <% if (p.id !== homeId) { %><form method="post" action="/admin/paginas/<%= p.id %>/excluir" data-confirm="Excluir a página “<%= p.title %>”? Esta ação não pode ser desfeita."><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn--sm btn--danger" type="submit">Excluir</button></form><% } %>
+          </td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- include('_foot') %>

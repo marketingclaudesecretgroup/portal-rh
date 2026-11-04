@@ -1,0 +1,51 @@
+<%- include('_head') %>
+<div class="content content--narrow">
+  <div class="page-title"><div><h1>Configurações</h1><p class="muted">Informações que aparecem em todo o portal (cabeçalho e rodapé).</p></div></div>
+  <form class="panel" method="post" action="/admin/configuracoes">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <h2>Identidade</h2>
+    <div class="row-2">
+      <label class="field"><span>Nome do portal</span><input name="site_name" value="<%= settings.site_name %>" required></label>
+      <label class="field"><span>Complemento</span><input name="site_tagline" value="<%= settings.site_tagline %>"></label>
+    </div>
+    <div class="field"><span>Logotipo (PNG/SVG, fundo transparente)</span>
+      <div class="image-field" data-image-field>
+        <input type="hidden" name="logo" value="<%= settings.logo %>">
+        <div class="image-field__preview"></div>
+        <div class="image-field__btns"><button type="button" class="btn btn--sm" data-pick>Escolher imagem</button><button type="button" class="btn btn--sm btn--ghost" data-clear>Usar logotipo em texto</button></div>
+      </div>
+    </div>
+    <label class="field"><span>Página inicial</span>
+      <select name="home_page_id"><option value="">Automático (página “inicio”)</option>
+        <% pages.forEach(function(p){ %><option value="<%= p.id %>" <%= String(settings.home_page_id)===String(p.id)?'selected':'' %>><%= p.title %></option><% }) %>
+      </select>
+    </label>
+    <hr>
+    <h2>Comunicados</h2>
+    <div class="row-2">
+      <label class="field"><span>Nome no menu (vazio = esconder do menu)</span><input name="articles_menu_label" value="<%= settings.articles_menu_label %>"></label>
+      <label class="field"><span>Título da página de comunicados</span><input name="articles_page_title" value="<%= settings.articles_page_title %>"></label>
+    </div>
+    <hr>
+    <h2>Contato do RH</h2>
+    <div class="row-2">
+      <label class="field"><span>E-mail</span><input name="contact_email" value="<%= settings.contact_email %>"></label>
+      <label class="field"><span>Telefone</span><input name="contact_phone" value="<%= settings.contact_phone %>"></label>
+      <label class="field"><span>Cidade</span><input name="contact_city" value="<%= settings.contact_city %>"></label>
+      <label class="field"><span>Link do WhatsApp do RH</span><input name="whatsapp_url" value="<%= settings.whatsapp_url %>" placeholder="https://wa.me/55419..."></label>
+    </div>
+    <hr>
+    <h2>Rodapé</h2>
+    <label class="field"><span>Texto institucional</span><textarea name="footer_about" rows="3"><%= settings.footer_about %></textarea></label>
+    <div class="row-2">
+      <label class="field"><span>Instagram</span><input name="instagram_url" value="<%= settings.instagram_url %>" placeholder="https://instagram.com/..."></label>
+      <label class="field"><span>Facebook</span><input name="facebook_url" value="<%= settings.facebook_url %>"></label>
+      <label class="field"><span>LinkedIn</span><input name="linkedin_url" value="<%= settings.linkedin_url %>"></label>
+      <label class="field"><span>Direitos autorais</span><input name="copyright" value="<%= settings.copyright %>"></label>
+      <label class="field"><span>Link do rodapé — texto</span><input name="footer_link_label" value="<%= settings.footer_link_label %>"></label>
+      <label class="field"><span>Link do rodapé — endereço</span><input name="footer_link_url" value="<%= settings.footer_link_url %>"></label>
+    </div>
+    <button class="btn btn--primary" type="submit">Salvar configurações</button>
+  </form>
+</div>
+<%- include('_foot') %>

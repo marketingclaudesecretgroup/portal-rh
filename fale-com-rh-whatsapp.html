@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fale com o RH</title>
+  <style>
+    :root {
+      --background: #ffffff;
+      --text: #171717;
+      --muted: #4f4d49;
+      --gold: #b7863f;
+      --gold-hover: #9e7131;
+      --border: #e4e1dc;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      background: transparent;
+      color: var(--text);
+      font-family: Inter, "Google Sans", Arial, sans-serif;
+    }
+
+    .help {
+      display: grid;
+      width: 100%;
+      max-width: 1200px;
+      min-height: 132px;
+      margin: 0 auto;
+      padding: 26px 38px;
+      grid-template-columns: 76px minmax(260px, 1fr) minmax(240px, 400px);
+      gap: 26px;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--background);
+    }
+
+    .help__icon {
+      display: grid;
+      width: 68px;
+      height: 68px;
+      color: var(--gold);
+      place-items: center;
+    }
+
+    .help__icon svg {
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.55;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .help__title {
+      margin: 0 0 10px;
+      font-size: 20px;
+      font-weight: 750;
+      line-height: 1.25;
+    }
+
+    .help__text {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.5;
+    }
+
+    .help__button {
+      display: inline-flex;
+      width: 100%;
+      min-height: 46px;
+      padding: 11px 22px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      background: var(--gold);
+      color: #171717;
+      font-size: 17px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background-color 160ms ease, color 160ms ease,
+        transform 160ms ease, box-shadow 160ms ease;
+    }
+
+    .help__button:hover,
+    .help__button:focus-visible {
+      background: var(--gold-hover);
+      color: #ffffff;
+      outline: none;
+      box-shadow: 0 8px 20px rgba(23, 23, 23, .14);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 720px) {
+      .help {
+        padding: 24px;
+        grid-template-columns: 58px 1fr;
+        gap: 18px;
+      }
+
+      .help__icon {
+        width: 54px;
+        height: 54px;
+      }
+
+      .help__button {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 440px) {
+      .help {
+        padding: 22px 18px;
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .help__icon { margin: 0 auto; }
+      .help__title { font-size: 19px; }
+      .help__text { font-size: 15px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .help__button { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="help" aria-labelledby="help-title">
+    <span class="help__icon" aria-hidden="true">
+      <svg viewBox="0 0 64 64">
+        <circle cx="32" cy="17" r="7"/>
+        <path d="M20 35c2-7 6-11 12-11s10 4 12 11"/>
+        <path d="M11 48 7 32c-1-4 1-7 4-8 3-1 5 1 6 4l3 9 7 4v13H16l-5-6Z"/>
+        <path d="m53 48 4-16c1-4-1-7-4-8-3-1-5 1-6 4l-3 9-7 4v13h11l5-6Z"/>
+        <path d="M16 54v6H7v-6h20v6h-7M48 54v6h9v-6H37v6h7"/>
+      </svg>
+    </span>
+
+    <div class="help__copy">
+      <h2 class="help__title" id="help-title">Precisa de ajuda?</h2>
+      <p class="help__text">O time de Gente &amp; Gestão está com você em cada etapa.</p>
+    </div>
+
+    <a
+      class="help__button"
+      href="https://wa.me/5541984165836"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Falar com o RH pelo WhatsApp"
+    >Falar com o RH</a>
+  </aside>
+</body>
+</html>

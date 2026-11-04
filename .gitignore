@@ -1,0 +1,27 @@
+# Dependências e dados locais
+node_modules/
+data/
+uploads/
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.log
+
+# Configurações e credenciais
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Relatórios gerados e arquivos do sistema
+test-results/
+playwright-report/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Pacote original desatualizado e lock sem projeto na raiz
+/comunica-secret-cms.zip
+/package-lock.json

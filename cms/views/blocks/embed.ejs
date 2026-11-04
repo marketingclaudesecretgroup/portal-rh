@@ -1,0 +1,9 @@
+<section class="section bg-<%= d.background %>" id="secao-<%= i+1 %>">
+  <div class="container">
+    <% if (d.title) { %><h2 class="section-title"><%= d.title %></h2><% } %>
+    <% if (d.url && /^https:\/\//.test(d.url)) { %>
+      <div class="embed"><iframe src="<%= d.url %>" height="<%= d.height %>" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="<%= d.title || 'Conteúdo incorporado' %>"></iframe></div>
+    <% } else { %><p class="muted center">Adicione um endereço https:// para exibir o conteúdo.</p><% } %>
+    <% if (d.note) { %><p class="muted center small"><%= d.note %></p><% } %>
+  </div>
+</section>

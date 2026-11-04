@@ -1,0 +1,16 @@
+<section class="section section--tight" id="secao-<%= i+1 %>">
+  <div class="container">
+    <aside class="help">
+      <span class="help__icon"><%- icon('fone') %></span>
+      <div class="help__copy">
+        <h2 class="help__title"><%= d.title %></h2>
+        <% if (d.text) { %><p><%= d.text %></p><% } %>
+      </div>
+      <div class="help__action">
+        <% var u = d.url || settings.whatsapp_url || ('mailto:' + settings.contact_email); %>
+        <a class="btn btn--gold" href="<%= u %>"<%- linkAttrs(u) %>><%= d.button_label || 'Falar com o RH' %></a>
+        <% if (d.note) { %><small><%= d.note %></small><% } %>
+      </div>
+    </aside>
+  </div>
+</section>

@@ -1,0 +1,20 @@
+<%- include('_head') %>
+<article class="article">
+  <header class="article__head container container--narrow">
+    <a class="back-link" href="/comunicados">← <%= settings.articles_page_title || 'Comunicados' %></a>
+    <p class="eyebrow"><%= article.category || 'Comunicado' %> · <%= fmtDate(article.published_at) %></p>
+    <h1><%= article.title %></h1>
+    <% if (article.excerpt) { %><p class="article__lead"><%= article.excerpt %></p><% } %>
+  </header>
+  <% if (article.cover) { %><div class="container container--mid"><img class="article__cover" src="<%= article.cover %>" alt=""></div><% } %>
+  <div class="container container--narrow rich"><%- article.content %></div>
+</article>
+<% if (related.length) { %>
+<section class="section section--soft">
+  <div class="container">
+    <h2 class="section-title">Veja também</h2>
+    <div class="post-grid"><% related.forEach(function(a){ %><%- include('_article-card', { a: a }) %><% }) %></div>
+  </div>
+</section>
+<% } %>
+<%- include('_foot') %>

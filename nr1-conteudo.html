@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NR1 — cuidado e prevenção</title>
+  <style>
+    :root {
+      --white: #fff;
+      --off-white: #f5f4f1;
+      --text: #171717;
+      --muted: #625f5a;
+      --gold: #b7863f;
+      --sage: #687355;
+      --border: #e4e1dc;
+      --shadow: 0 8px 24px rgba(23, 23, 23, .055);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      background: var(--white);
+      color: var(--text);
+      font-family: Inter, "Google Sans", Arial, sans-serif;
+    }
+
+    a { color: inherit; }
+
+    .nr1 {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .section { padding: 48px 28px; }
+    .section--soft { background: var(--off-white); }
+
+    .section-title {
+      margin: 0 0 30px;
+      font-size: clamp(24px, 3vw, 34px);
+      line-height: 1.2;
+      letter-spacing: -.025em;
+      text-align: center;
+    }
+
+    .intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      align-items: center;
+    }
+
+    .intro__copy { padding-right: 64px; }
+
+    .intro__title {
+      margin: 0 0 16px;
+      font-size: clamp(27px, 3vw, 38px);
+      line-height: 1.15;
+    }
+
+    .intro__text {
+      max-width: 540px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .intro__message {
+      display: flex;
+      min-height: 150px;
+      padding: 26px 44px;
+      align-items: center;
+      gap: 26px;
+      border-left: 1px solid var(--border);
+      color: var(--sage);
+    }
+
+    .intro__message p {
+      max-width: 270px;
+      margin: 0;
+      font-size: 21px;
+      line-height: 1.45;
+    }
+
+    .icon {
+      display: grid;
+      flex: 0 0 auto;
+      width: 54px;
+      height: 54px;
+      color: var(--sage);
+      place-items: center;
+    }
+
+    .icon svg {
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.65;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .step {
+      position: relative;
+      min-height: 235px;
+      padding: 34px 26px 28px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .step__number {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      display: grid;
+      width: 34px;
+      height: 34px;
+      margin: 0;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 700;
+      place-items: center;
+    }
+
+    .step .icon {
+      width: 48px;
+      height: 48px;
+      margin: 14px auto 18px;
+      color: #8d7860;
+    }
+
+    .step__title {
+      margin: 0 0 11px;
+      color: var(--gold);
+      font-size: 19px;
+    }
+
+    .step__text,
+    .initiative__text {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .initiatives {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .initiative {
+      min-height: 175px;
+      padding: 24px 20px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--white);
+      text-align: center;
+      transition: border-color 160ms ease, transform 160ms ease,
+        box-shadow 160ms ease;
+    }
+
+    .initiative:hover {
+      border-color: rgba(183, 134, 63, .55);
+      box-shadow: var(--shadow);
+      transform: translateY(-3px);
+    }
+
+    .initiative .icon {
+      width: 42px;
+      height: 42px;
+      margin: 0 auto 13px;
+    }
+
+    .initiative__title {
+      margin: 0 0 8px;
+      font-size: 15px;
+      line-height: 1.3;
+    }
+
+    .shared {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      margin: 0 28px 44px;
+      overflow: hidden;
+      border: 1px solid #eee7db;
+      border-radius: 11px;
+      background: linear-gradient(90deg, #f8f3ea, #f5f4f1);
+    }
+
+    .shared__icon {
+      display: grid;
+      border-right: 1px solid #ded4c5;
+      color: var(--gold);
+      place-items: center;
+    }
+
+    .shared__icon .icon { color: var(--gold); }
+
+    .shared__copy { padding: 27px 30px; }
+
+    .shared__title {
+      margin: 0 0 8px;
+      font-size: 19px;
+    }
+
+    .shared__text {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .support { padding-top: 0; }
+
+    .support__grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .support-card {
+      display: grid;
+      grid-template-columns: 62px 1fr;
+      gap: 18px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .support-card .icon {
+      width: 48px;
+      height: 48px;
+      margin-top: 2px;
+    }
+
+    .support-card__title {
+      margin: 0 0 6px;
+      font-size: 17px;
+    }
+
+    .support-card__text {
+      margin: 0 0 17px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 40px;
+      padding: 10px 18px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      background: var(--gold);
+      color: var(--white);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: filter 160ms ease, transform 160ms ease;
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      filter: brightness(.9);
+      outline: 2px solid rgba(183, 134, 63, .35);
+      outline-offset: 3px;
+      transform: translateY(-1px);
+    }
+
+    .urgent {
+      display: flex;
+      max-width: 900px;
+      margin: 16px auto 0;
+      padding: 13px 18px;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 1px solid #dde1d7;
+      border-radius: 8px;
+      background: #f0f2ed;
+      color: #42483b;
+      font-size: 13px;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .urgent svg {
+      flex: 0 0 auto;
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+    }
+
+    @media (max-width: 780px) {
+      .section { padding: 38px 18px; }
+      .intro { grid-template-columns: 1fr; }
+      .intro__copy { padding: 0 0 28px; }
+      .intro__message {
+        min-height: 0;
+        padding: 26px 0 0;
+        border-top: 1px solid var(--border);
+        border-left: 0;
+      }
+      .steps,
+      .initiatives { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .support__grid { grid-template-columns: 1fr; }
+      .shared { margin: 0 18px 38px; }
+    }
+
+    @media (max-width: 520px) {
+      .steps,
+      .initiatives { grid-template-columns: 1fr; }
+      .step { min-height: 0; }
+      .shared { grid-template-columns: 1fr; }
+      .shared__icon {
+        padding: 20px;
+        border-right: 0;
+        border-bottom: 1px solid #ded4c5;
+      }
+      .shared__copy { padding: 22px; text-align: center; }
+      .support-card { grid-template-columns: 1fr; text-align: center; }
+      .support-card .icon { margin: 0 auto; }
+      .button { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .initiative, .button { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="nr1">
+    <section class="section intro" aria-labelledby="what-is-nr1">
+      <div class="intro__copy">
+        <h2 class="intro__title" id="what-is-nr1">O que é a NR1?</h2>
+        <p class="intro__text">A Norma Regulamentadora nº 1 estabelece disposições gerais e orienta o gerenciamento de riscos ocupacionais. Entre eles, estão os fatores de risco psicossociais relacionados ao trabalho.</p>
+      </div>
+      <aside class="intro__message" aria-label="Mensagem de prevenção">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><path d="M24 4 40 10v12c0 10-6 17-16 22C14 39 8 32 8 22V10l16-6Z"/><path d="M24 33s-9-5-9-12c0-3 2-5 5-5 2 0 3 1 4 3 1-2 2-3 4-3 3 0 5 2 5 5 0 7-9 12-9 12Z"/></svg>
+        </span>
+        <p>Prevenir começa por identificar, ouvir e agir.</p>
+      </aside>
+    </section>
+
+    <section class="section section--soft" aria-labelledby="care-title">
+      <h2 class="section-title" id="care-title">Como esse cuidado acontece</h2>
+      <div class="steps">
+        <article class="step">
+          <span class="step__number">01</span>
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="20" cy="20" r="12"/><path d="m29 29 12 12M16 16c2-2 6-3 9-1"/></svg></span>
+          <h3 class="step__title">Identificar</h3>
+          <p class="step__text">Reconhecer fatores relacionados à organização e às condições de trabalho.</p>
+        </article>
+        <article class="step">
+          <span class="step__number">02</span>
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="15" r="6"/><circle cx="10" cy="20" r="4"/><circle cx="38" cy="20" r="4"/><path d="M13 40v-5c0-6 5-10 11-10s11 4 11 10v5M3 40v-4c0-5 3-8 8-8 2 0 4 1 5 2M45 40v-4c0-5-3-8-8-8-2 0-4 1-5 2"/></svg></span>
+          <h3 class="step__title">Avaliar</h3>
+          <p class="step__text">Analisar os riscos com responsabilidade e participação das pessoas.</p>
+        </article>
+        <article class="step">
+          <span class="step__number">03</span>
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 5 40 11v11c0 10-6 17-16 21C14 39 8 32 8 22V11l16-6Z"/><path d="m16 24 5 5 11-12"/></svg></span>
+          <h3 class="step__title">Prevenir</h3>
+          <p class="step__text">Planejar ações, acompanhar resultados e melhorar continuamente.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="initiatives-title">
+      <h2 class="section-title" id="initiatives-title">Nossas iniciativas</h2>
+      <div class="initiatives">
+        <article class="initiative"><span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M7 22 24 7l17 15v20H7V22Z"/><path d="M24 34s-7-4-7-10c0-3 2-4 4-4 2 0 3 1 3 3 1-2 2-3 4-3 2 0 4 1 4 4 0 6-8 10-8 10Z"/></svg></span><h3 class="initiative__title">Ambientes mais seguros</h3><p class="initiative__text">Organização e conforto para um dia a dia melhor.</p></article>
+        <article class="initiative"><span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 10h32v23H23L13 41v-8H8V10Z"/></svg></span><h3 class="initiative__title">Escuta ativa</h3><p class="initiative__text">Ouvir para entender e apoiar melhor.</p></article>
+        <article class="initiative"><span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="15" r="7"/><path d="M10 42v-5c0-8 5-13 14-13s14 5 14 13v5"/></svg></span><h3 class="initiative__title">Desenvolvimento de líderes</h3><p class="initiative__text">Lideranças preparadas para cuidar de pessoas.</p></article>
+        <article class="initiative"><span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 42V29h8v13M20 42V21h8v21M32 42V10h8v32M5 42h38"/></svg></span><h3 class="initiative__title">Acompanhamento de indicadores</h3><p class="initiative__text">Dados para decisões mais assertivas e preventivas.</p></article>
+        <article class="initiative"><span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="8"/><path d="M24 5v5M24 38v5M5 24h5M38 24h5M11 11l4 4M33 33l4 4M37 11l-4 4M15 33l-4 4"/></svg></span><h3 class="initiative__title">Tecnologia e melhoria de processos</h3><p class="initiative__text">Menos burocracia, mais tempo para o que importa.</p></article>
+        <article class="initiative"><span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M7 26h8l19 9V10L15 19H7v7ZM15 26l3 14h7l-4-12M39 17l5-3M39 28l5 3"/></svg></span><h3 class="initiative__title">Comunicação e conscientização</h3><p class="initiative__text">Informação clara para escolhas conscientes.</p></article>
+      </div>
+    </section>
+
+    <aside class="shared">
+      <div class="shared__icon"><span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="14" r="6"/><circle cx="10" cy="19" r="4"/><circle cx="38" cy="19" r="4"/><path d="M13 42v-6c0-7 5-11 11-11s11 4 11 11v6M3 42v-5c0-5 3-8 8-8M45 42v-5c0-5-3-8-8-8"/></svg></span></div>
+      <div class="shared__copy"><h2 class="shared__title">Cuidar das pessoas é uma responsabilidade compartilhada</h2><p class="shared__text">Lideranças, equipes, Gente &amp; Gestão e Segurança do Trabalho participam da construção de um ambiente respeitoso, seguro e saudável.</p></div>
+    </aside>
+
+    <section class="section support" aria-labelledby="support-title">
+      <h2 class="section-title" id="support-title">Precisa conversar?</h2>
+      <div class="support__grid">
+        <article class="support-card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 28v-7a16 16 0 0 1 32 0v7M8 27H4v10h8V27H8ZM40 27h4v10h-8V27h4ZM36 39c-2 3-5 4-9 4"/></svg></span><div><h3 class="support-card__title">Fale com Gente &amp; Gestão</h3><p class="support-card__text">Para dúvidas, orientações e acolhimento.</p><a class="button" href="mailto:rh@secretoutlet.com.br" target="_blank" rel="noopener noreferrer">Entrar em contato</a></div></article>
+        <article class="support-card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M11 5h19l8 8v30H11V5Z"/><path d="M30 5v9h8M17 23h15M17 30h15M17 37h10"/></svg></span><div><h3 class="support-card__title">Consulte os materiais oficiais</h3><p class="support-card__text">Acesse informações e referências sobre a NR1.</p><a class="button" href="https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/nr-1" target="_blank" rel="noopener noreferrer">Ver materiais</a></div></article>
+      </div>
+      <p class="urgent"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10v6M12 7h.01"/></svg>Em situações de urgência, procure imediatamente os serviços de emergência da sua região.</p>
+    </section>
+  </main>
+</body>
+</html>

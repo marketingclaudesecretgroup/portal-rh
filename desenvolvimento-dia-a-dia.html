@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Desenvolvimento no dia a dia</title>
+  <style>
+    :root {
+      --background: #ffffff;
+      --text: #171717;
+      --muted: #66635f;
+      --accent: #b7863f;
+      --icon-background: #f5f4f1;
+      --divider: #e4e1dc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--text);
+      font-family: Inter, "Google Sans", Arial, sans-serif;
+    }
+
+    .development {
+      width: 100%;
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 24px 20px 28px;
+    }
+
+    .development__title {
+      margin: 0 0 28px;
+      font-size: clamp(24px, 3vw, 34px);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.025em;
+      text-align: center;
+    }
+
+    .development__grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .development-item {
+      position: relative;
+      display: flex;
+      min-height: 155px;
+      padding: 0 34px;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .development-item + .development-item::before {
+      position: absolute;
+      top: 8px;
+      bottom: 8px;
+      left: 0;
+      width: 1px;
+      background: var(--divider);
+      content: "";
+    }
+
+    .development-item__icon {
+      display: grid;
+      width: 58px;
+      height: 58px;
+      margin-bottom: 18px;
+      border-radius: 50%;
+      background: var(--icon-background);
+      color: var(--text);
+      place-items: center;
+      transition: background-color 160ms ease, color 160ms ease,
+        transform 160ms ease;
+    }
+
+    .development-item:hover .development-item__icon {
+      background: var(--accent);
+      color: #ffffff;
+      transform: translateY(-3px);
+    }
+
+    .development-item__icon svg {
+      width: 31px;
+      height: 31px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .development-item__title {
+      margin: 0 0 9px;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .development-item__description {
+      max-width: 220px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 700px) {
+      .development {
+        padding: 20px 16px;
+      }
+
+      .development__title {
+        margin-bottom: 22px;
+      }
+
+      .development__grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .development-item {
+        min-height: 0;
+        padding: 22px 10px;
+      }
+
+      .development-item + .development-item::before {
+        top: 0;
+        right: 12%;
+        bottom: auto;
+        left: 12%;
+        width: auto;
+        height: 1px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .development-item__icon {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="development" aria-labelledby="development-title">
+    <h2 class="development__title" id="development-title">
+      Desenvolvimento no dia a dia
+    </h2>
+
+    <div class="development__grid">
+      <article class="development-item">
+        <span class="development-item__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="18"/>
+            <path d="M24 13v12l8 5"/>
+          </svg>
+        </span>
+        <h3 class="development-item__title">Aprenda no seu ritmo</h3>
+        <p class="development-item__description">
+          Acesse os conteúdos quando precisar.
+        </p>
+      </article>
+
+      <article class="development-item">
+        <span class="development-item__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <circle cx="24" cy="16" r="6"/>
+            <circle cx="10" cy="20" r="4"/>
+            <circle cx="38" cy="20" r="4"/>
+            <path d="M13 39v-5c0-6 5-10 11-10s11 4 11 10v5M3 39v-4c0-5 3-8 8-8 2 0 4 1 5 2M45 39v-4c0-5-3-8-8-8-2 0-4 1-5 2"/>
+          </svg>
+        </span>
+        <h3 class="development-item__title">Compartilhe conhecimento</h3>
+        <p class="development-item__description">
+          Troque experiências com seu time.
+        </p>
+      </article>
+
+      <article class="development-item">
+        <span class="development-item__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <rect x="8" y="9" width="31" height="31" rx="3"/>
+            <path d="m15 23 7 7L43 9"/>
+          </svg>
+        </span>
+        <h3 class="development-item__title">Coloque em prática</h3>
+        <p class="development-item__description">
+          Transforme aprendizado em resultado.
+        </p>
+      </article>
+    </div>
+  </section>
+</body>
+</html>

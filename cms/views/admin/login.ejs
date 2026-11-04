@@ -1,0 +1,15 @@
+<%- include('_head') %>
+<div class="auth">
+  <form class="auth__box" method="post" action="/admin/login">
+    <div class="auth__brand"><span class="side__mark">S</span><div><strong><%= settings.site_name %></strong><small>Painel de conteúdo</small></div></div>
+    <h1>Entrar</h1>
+    <% if (error) { %><div class="flash flash--erro"><%= error %></div><% } %>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="next" value="<%= next %>">
+    <label class="field"><span>E-mail</span><input type="email" name="email" value="<%= email %>" required autofocus autocomplete="username"></label>
+    <label class="field"><span>Senha</span><input type="password" name="password" required autocomplete="current-password"></label>
+    <button class="btn btn--primary btn--block" type="submit">Entrar</button>
+    <p class="muted small center">Esqueceu a senha? Peça a um administrador para redefinir.</p>
+  </form>
+</div>
+<%- include('_foot') %>

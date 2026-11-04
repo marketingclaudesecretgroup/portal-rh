@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Para não perder nenhuma data</title>
+  <style>
+    :root {
+      --background: #ffffff;
+      --text: #171717;
+      --muted: #66635f;
+      --gold: #b7863f;
+      --divider: #e4e1dc;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--text);
+      font-family: Inter, "Google Sans", Arial, sans-serif;
+    }
+
+    .calendar-tips {
+      width: 100%;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 22px 20px 28px;
+    }
+
+    .calendar-tips__grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .calendar-tip {
+      position: relative;
+      display: flex;
+      min-height: 145px;
+      padding: 5px 34px;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .calendar-tip + .calendar-tip::before {
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      left: 0;
+      width: 1px;
+      background: var(--divider);
+      content: "";
+    }
+
+    .calendar-tip__icon {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 14px;
+      color: var(--gold);
+      place-items: center;
+      transition: transform 160ms ease, color 160ms ease;
+    }
+
+    .calendar-tip:hover .calendar-tip__icon {
+      color: #956a30;
+      transform: translateY(-3px);
+    }
+
+    .calendar-tip__icon svg {
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .calendar-tip__title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 750;
+      line-height: 1.3;
+    }
+
+    .calendar-tip__description {
+      max-width: 230px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 700px) {
+      .calendar-tips { padding: 12px 18px 20px; }
+
+      .calendar-tips__grid {
+        grid-template-columns: 1fr;
+      }
+
+      .calendar-tip {
+        min-height: 0;
+        padding: 24px 12px;
+      }
+
+      .calendar-tip + .calendar-tip::before {
+        top: 0;
+        right: 12%;
+        bottom: auto;
+        left: 12%;
+        width: auto;
+        height: 1px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .calendar-tip__icon { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <section class="calendar-tips" aria-label="Como acompanhar as datas">
+    <div class="calendar-tips__grid">
+      <article class="calendar-tip">
+        <span class="calendar-tip__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <rect x="6" y="9" width="36" height="33" rx="4"/>
+            <path d="M15 5v8M33 5v8M6 18h36M14 25h4M23 25h4M32 25h4M14 33h4M23 33h4M32 33h4"/>
+          </svg>
+        </span>
+        <h3 class="calendar-tip__title">Acompanhe o calendário</h3>
+        <p class="calendar-tip__description">Consulte esta página regularmente.</p>
+      </article>
+
+      <article class="calendar-tip">
+        <span class="calendar-tip__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <path d="M14 32h20l-3-5V17a7 7 0 0 0-14 0v10l-3 5Z"/>
+            <path d="M21 37c1 4 5 4 6 0M24 7V4"/>
+          </svg>
+        </span>
+        <h3 class="calendar-tip__title">Fique de olho nos comunicados</h3>
+        <p class="calendar-tip__description">Confira os canais oficiais da Secret.</p>
+      </article>
+
+      <article class="calendar-tip">
+        <span class="calendar-tip__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <circle cx="18" cy="16" r="6"/>
+            <circle cx="34" cy="18" r="5"/>
+            <path d="M5 40v-5c0-7 5-11 13-11s13 4 13 11v5M29 27c2-2 4-3 7-3 6 0 9 4 9 10v6H31"/>
+          </svg>
+        </span>
+        <h3 class="calendar-tip__title">Converse com sua liderança</h3>
+        <p class="calendar-tip__description">Alinhe dúvidas sobre escalas e compromissos.</p>
+      </article>
+    </div>
+  </section>
+</body>
+</html>

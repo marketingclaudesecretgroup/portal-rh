@@ -1,0 +1,19 @@
+<%- include('_head') %>
+<div class="content">
+  <div class="page-title"><div><h1>Mídia</h1><p class="muted">Imagens e PDFs usados no portal. Clique em um arquivo para copiar o endereço.</p></div>
+    <label class="btn btn--primary"><input type="file" accept="image/*,application/pdf" multiple hidden id="media-upload">Enviar arquivos</label></div>
+  <p class="muted small" id="upload-status"></p>
+  <% if (!media.length) { %><div class="panel"><p class="muted">Nenhum arquivo enviado ainda.</p></div><% } %>
+  <div class="media-grid">
+    <% media.forEach(function(m){ %>
+    <figure class="media-item">
+      <button type="button" class="media-item__thumb" data-copy="<%= m.url %>" title="Copiar endereço">
+        <% if (m.mime === 'application/pdf') { %><span class="media-item__pdf">PDF</span><% } else { %><img src="<%= m.url %>" alt="" loading="lazy"><% } %>
+      </button>
+      <figcaption><span title="<%= m.original_name %>"><%= m.original_name %></span><small class="muted"><%= Math.round(m.size/1024) %> KB · <%= fmtDate(m.created_at) %></small></figcaption>
+      <form method="post" action="/admin/midia/<%= m.id %>/excluir" data-confirm="Excluir este arquivo? Se ele estiver em uso, a imagem vai sumir da página."><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="link-danger" type="submit">Excluir</button></form>
+    </figure>
+    <% }) %>
+  </div>
+</div>
+<%- include('_foot') %>

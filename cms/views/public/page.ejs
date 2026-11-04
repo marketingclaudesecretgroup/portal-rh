@@ -1,0 +1,8 @@
+<%- include('_head') %>
+<% if (!blocks.length) { %>
+  <section class="section"><div class="container"><h1 class="section-title section-title--left"><%= page.title %></h1><p class="muted">Esta página ainda não tem conteúdo.</p></div></section>
+<% } %>
+<% blocks.forEach(function(b, i){ %>
+  <%- include('../blocks/' + b.type, { b: b, d: b.data, i: b.index }) %>
+<% }) %>
+<%- include('_foot') %>

@@ -1,0 +1,10 @@
+<section class="section bg-<%= d.background %>" id="secao-<%= i+1 %>">
+  <div class="container container--mid">
+    <% if (d.title) { %><h2 class="section-title"><%= d.title %></h2><% } %>
+    <div class="faq">
+      <% (d.items||[]).forEach(function(it){ %>
+      <details class="faq__item"><summary><%= it.question %></summary><p><%= it.answer %></p></details>
+      <% }) %>
+    </div>
+  </div>
+</section>

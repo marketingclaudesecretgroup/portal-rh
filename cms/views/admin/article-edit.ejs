@@ -1,0 +1,42 @@
+<%- include('_head', { useEditor: true }) %>
+<div class="content content--wide">
+  <form method="post" action="/admin/comunicados/<%= article.id %>" id="article-form" class="editor-layout">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="content" id="content-input">
+    <div class="editor-main">
+      <div class="page-title">
+        <div><a class="muted small" href="/admin/comunicados">← Comunicados</a><h1><%= article.id ? 'Editar comunicado' : 'Novo comunicado' %></h1></div>
+        <% if (article.id) { %><a class="btn" href="/comunicados/<%= article.slug %>" target="_blank" rel="noopener">Visualizar ↗</a><% } %>
+      </div>
+      <label class="field field--title"><span>Título</span><input name="title" value="<%= article.title %>" required placeholder="Ex.: Black Friday 2026: dicas e preparativos"></label>
+      <label class="field"><span>Resumo (aparece nos cards e no topo do comunicado)</span><textarea name="excerpt" rows="2" maxlength="400"><%= article.excerpt || '' %></textarea></label>
+      <div class="field"><span>Texto</span><div class="rte rte--tall" id="content-editor"></div></div>
+    </div>
+    <aside class="editor-side">
+      <div class="panel sticky">
+        <h2>Publicação</h2>
+        <label class="field"><span>Status</span>
+          <select name="status"><option value="draft" <%= article.status!=='published'?'selected':'' %>>Rascunho</option><option value="published" <%= article.status==='published'?'selected':'' %>>Publicado</option></select>
+        </label>
+        <label class="field"><span>Data de publicação</span><input type="datetime-local" name="published_at" value="<%= publishedLocal %>"><small class="muted">Data futura = agendado (horário de Brasília).</small></label>
+        <label class="check"><input type="checkbox" name="featured" <%= article.featured ? 'checked' : '' %>> Fixar no topo da lista</label>
+        <button class="btn btn--primary btn--block" type="submit">Salvar comunicado</button>
+        <hr>
+        <label class="field"><span>Categoria</span><input name="category" value="<%= article.category || '' %>" list="cats" placeholder="Ex.: Campanhas, Treinamentos"></label>
+        <datalist id="cats"><% categories.forEach(function(c){ %><option value="<%= c %>"><% }) %></datalist>
+        <div class="field"><span>Imagem de capa</span>
+          <div class="image-field" data-image-field>
+            <input type="hidden" name="cover" value="<%= article.cover || '' %>">
+            <div class="image-field__preview"></div>
+            <div class="image-field__btns"><button type="button" class="btn btn--sm" data-pick>Escolher imagem</button><button type="button" class="btn btn--sm btn--ghost" data-clear>Remover</button></div>
+          </div>
+        </div>
+        <label class="field"><span>Endereço (URL)</span><div class="input-prefix"><span>/comunicados/</span><input name="slug" value="<%= article.slug %>" placeholder="gerado pelo título"></div></label>
+      </div>
+    </aside>
+  </form>
+</div>
+<script src="/vendor/quill/quill.js"></script>
+<script>window.INITIAL_CONTENT = <%- JSON.stringify(article.content || '').replace(/</g, '\\u003c') %>;</script>
+<script src="/static/js/article-editor.js"></script>
+<%- include('_foot') %>

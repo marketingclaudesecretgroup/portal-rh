@@ -1,0 +1,15 @@
+<%- include('_head') %>
+<div class="auth">
+  <form class="auth__box" method="post" action="/admin/setup">
+    <div class="auth__brand"><span class="side__mark">S</span><div><strong><%= settings.site_name %></strong><small>Configuração inicial</small></div></div>
+    <h1>Criar administrador</h1>
+    <p class="muted">Este é o primeiro acesso. Crie a conta que vai administrar o portal — depois você poderá adicionar outras pessoas.</p>
+    <% if (error) { %><div class="flash flash--erro"><%= error %></div><% } %>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label class="field"><span>Nome</span><input name="name" value="<%= form.name || '' %>" required></label>
+    <label class="field"><span>E-mail</span><input type="email" name="email" value="<%= form.email || '' %>" required></label>
+    <label class="field"><span>Senha (mínimo 8 caracteres)</span><input type="password" name="password" minlength="8" required autocomplete="new-password"></label>
+    <button class="btn btn--primary btn--block" type="submit">Criar conta e entrar</button>
+  </form>
+</div>
+<%- include('_foot') %>

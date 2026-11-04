@@ -1,0 +1,15 @@
+<%- include('_head') %>
+<div class="content content--narrow">
+  <div class="page-title"><div><h1>Meu perfil</h1><p class="muted"><%= currentUser.email %></p></div></div>
+  <% if (error) { %><div class="flash flash--erro"><%= error %></div><% } %>
+  <form class="panel" method="post" action="/admin/perfil">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label class="field"><span>Nome</span><input name="name" value="<%= currentUser.name %>" required></label>
+    <hr>
+    <h2>Trocar senha</h2>
+    <label class="field"><span>Senha atual</span><input type="password" name="current" autocomplete="current-password"></label>
+    <label class="field"><span>Nova senha (mínimo 8 caracteres)</span><input type="password" name="password" minlength="8" autocomplete="new-password"></label>
+    <button class="btn btn--primary" type="submit">Salvar</button>
+  </form>
+</div>
+<%- include('_foot') %>

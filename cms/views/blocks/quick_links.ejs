@@ -1,0 +1,14 @@
+<section class="section bg-<%= d.background %>" id="secao-<%= i+1 %>">
+  <div class="container">
+    <% if (d.title) { %><h2 class="section-title section-title--left"><%= d.title %></h2><% } %>
+    <% if (d.style === 'pills') { %>
+      <div class="pills"><% (d.items||[]).forEach(function(it){ %><a class="pill" href="<%= it.url || '#' %>"<%- linkAttrs(it.url) %>><% if (it.icon) { %><%- icon(it.icon) %><% } %><%= it.label %></a><% }) %></div>
+    <% } else { %>
+      <nav class="quick" aria-label="<%= d.title || 'Atalhos' %>">
+        <% (d.items||[]).forEach(function(it){ %>
+        <a class="quick__link" href="<%= it.url || '#' %>"<%- linkAttrs(it.url) %>><%- icon(it.icon || 'link') %><span><%= it.label %></span></a>
+        <% }) %>
+      </nav>
+    <% } %>
+  </div>
+</section>

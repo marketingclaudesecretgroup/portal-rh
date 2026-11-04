@@ -1,0 +1,28 @@
+<%- include('_head') %>
+<section class="page-head">
+  <div class="container">
+    <p class="eyebrow">Notícias e avisos</p>
+    <h1><%= title %></h1>
+    <p>Tudo o que está acontecendo na Secret, em um só lugar.</p>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <% if (categories.length) { %>
+    <nav class="filter" aria-label="Filtrar por categoria">
+      <a href="/comunicados" class="<%= !category ? 'is-active' : '' %>">Todos</a>
+      <% categories.forEach(function(c){ %><a href="/comunicados?categoria=<%= encodeURIComponent(c) %>" class="<%= category && category.toLowerCase()===c.toLowerCase() ? 'is-active' : '' %>"><%= c %></a><% }) %>
+    </nav>
+    <% } %>
+    <% if (!articles.length) { %><p class="muted center">Nenhum comunicado publicado por aqui ainda.</p><% } %>
+    <div class="post-grid">
+      <% articles.forEach(function(a){ %><%- include('_article-card', { a: a }) %><% }) %>
+    </div>
+    <% if (pages > 1) { %>
+    <nav class="pager" aria-label="Paginação">
+      <% for (var n = 1; n <= pages; n++) { %><a class="<%= n===pageN?'is-active':'' %>" href="/comunicados?pagina=<%= n %><%= category ? '&categoria=' + encodeURIComponent(category) : '' %>"><%= n %></a><% } %>
+    </nav>
+    <% } %>
+  </div>
+</section>
+<%- include('_foot') %>

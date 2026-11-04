@@ -1,0 +1,25 @@
+<%- include('_head') %>
+<div class="content">
+  <div class="page-title"><div><h1>Usuários</h1><p class="muted"><strong>Administradores</strong> gerenciam tudo, inclusive usuários e configurações. <strong>Editores</strong> criam e editam páginas, comunicados e mídia.</p></div><a class="btn btn--primary" href="/admin/usuarios/novo">+ Novo usuário</a></div>
+  <div class="panel panel--flush">
+    <table class="table">
+      <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th><th>Último acesso</th><th></th></tr></thead>
+      <tbody>
+      <% users.forEach(function(u){ %>
+        <tr>
+          <td><a class="strong" href="/admin/usuarios/<%= u.id %>"><%= u.name %></a><%= u.id === currentUser.id ? ' (você)' : '' %></td>
+          <td><%= u.email %></td>
+          <td><%= u.role === 'admin' ? 'Administrador' : 'Editor' %></td>
+          <td><span class="badge badge--<%= u.active ? 'published' : 'draft' %>"><%= u.active ? 'Ativo' : 'Inativo' %></span></td>
+          <td class="muted small"><%= u.last_login ? fmtDate(u.last_login, true) : 'Nunca' %></td>
+          <td class="actions">
+            <a class="btn btn--sm" href="/admin/usuarios/<%= u.id %>">Editar</a>
+            <% if (u.id !== currentUser.id) { %><form method="post" action="/admin/usuarios/<%= u.id %>/excluir" data-confirm="Excluir o usuário <%= u.name %>?"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn--sm btn--danger" type="submit">Excluir</button></form><% } %>
+          </td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- include('_foot') %>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title && title !== settings.site_name ? title + ' — ' + settings.site_name : settings.site_name %></title>
+  <% if (typeof description !== 'undefined' && description) { %><meta name="description" content="<%= description %>"><% } %>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/site.css">
+</head>
+<body>
+<% if (currentUser) { %>
+<div class="adminbar">
+  <span>Você está conectado como <strong><%= currentUser.name %></strong><% if (typeof isDraft !== 'undefined' && isDraft) { %> · <em class="adminbar__draft">Rascunho — não visível para colaboradores</em><% } %></span>
+  <span>
+    <% if (typeof page !== 'undefined' && page) { %><a href="/admin/paginas/<%= page.id %>">Editar esta página</a><% } %>
+    <% if (typeof article !== 'undefined' && article) { %><a href="/admin/comunicados/<%= article.id %>">Editar este comunicado</a><% } %>
+    <a href="/admin">Painel</a>
+  </span>
+</div>
+<% } %>
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="brand" href="/" aria-label="<%= settings.site_name %> — início">
+      <% if (settings.logo) { %><img src="<%= settings.logo %>" alt="<%= settings.site_name %>"><% } else { %>
+      <span class="brand__mark" aria-hidden="true">S</span><span class="brand__text"><strong>SECRET</strong><small>GROUP</small></span>
+      <% } %>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr">Menu</span></button>
+    <nav class="site-nav" id="site-nav" aria-label="Navegação principal">
+      <ul>
+      <% menu.forEach(function(item){ var active = currentPath === item.url || item.children.some(function(c){return c.url===currentPath}) || (item.url !== '/' && currentPath.indexOf(item.url + '/') === 0); %>
+        <li class="<%= item.children.length ? 'has-sub' : '' %> <%= active ? 'is-active' : '' %>">
+          <a href="<%= item.url %>"><%= item.label %></a>
+          <% if (item.children.length) { %>
+          <button class="sub-toggle" type="button" aria-label="Abrir submenu de <%= item.label %>" aria-expanded="false"></button>
+          <ul class="sub">
+            <% item.children.forEach(function(c){ %><li><a href="<%= c.url %>" class="<%= currentPath===c.url?'is-active':'' %>"><%= c.label %></a></li><% }) %>
+          </ul>
+          <% } %>
+        </li>
+      <% }) %>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="conteudo">

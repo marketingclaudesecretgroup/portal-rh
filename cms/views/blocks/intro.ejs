@@ -1,0 +1,11 @@
+<section class="section bg-<%= d.background %>" id="secao-<%= i+1 %>">
+  <div class="container intro <%= d.highlight_text ? 'intro--split' : '' %>">
+    <div class="intro__copy">
+      <% if (d.title) { %><h2 class="intro__title"><%= d.title %></h2><% } %>
+      <% if (d.text) { %><p class="intro__text"><%= d.text %></p><% } %>
+    </div>
+    <% if (d.highlight_text) { %>
+    <aside class="intro__aside"><%- icon(d.highlight_icon || 'estrela') %><p><%= d.highlight_text %></p></aside>
+    <% } %>
+  </div>
+</section>

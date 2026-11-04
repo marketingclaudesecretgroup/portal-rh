@@ -1,0 +1,19 @@
+<section class="section section--tight" id="secao-<%= i+1 %>">
+  <div class="container">
+    <div class="banner banner--<%= d.theme %> <%= d.image ? 'banner--img' : '' %>">
+      <% if (d.image) { %><img class="banner__img" src="<%= d.image %>" alt="" loading="lazy"><% } else if (d.icon) { %><span class="banner__icon"><%- icon(d.icon) %></span><% } %>
+      <div class="banner__copy">
+        <% if (d.eyebrow) { %><p class="eyebrow eyebrow--gold"><%= d.eyebrow %></p><% } %>
+        <% if (d.title) { %><h2 class="banner__title"><%= d.title %></h2><% } %>
+        <% if (d.text) { %><p class="banner__text"><%= d.text %></p><% } %>
+        <% if (d.button_label || d.button2_label) { %>
+        <div class="btn-row">
+          <% if (d.button_label) { %><a class="btn btn--gold" href="<%= d.url || '#' %>"<%- linkAttrs(d.url) %>><%= d.button_label %></a><% } %>
+          <% if (d.button2_label) { %><a class="btn <%= d.theme==='escuro' ? 'btn--ghost' : 'btn--outline' %>" href="<%= d.button2_url || '#' %>"<%- linkAttrs(d.button2_url) %>><%= d.button2_label %></a><% } %>
+        </div>
+        <% } %>
+        <% if (d.note) { %><p class="banner__note"><%= d.note %></p><% } %>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,10 @@
+<section class="section bg-<%= d.background %>" id="secao-<%= i+1 %>">
+  <div class="container">
+    <div class="section-head">
+      <% if (d.title) { %><h2 class="section-title section-title--left"><%= d.title %></h2><% } %>
+      <% if (d.show_all) { %><a class="text-link" href="/comunicados<%= d.category ? '?categoria=' + encodeURIComponent(d.category) : '' %>">Ver todos</a><% } %>
+    </div>
+    <% if (!(b.articles||[]).length) { %><p class="muted">Nenhum comunicado publicado ainda.</p><% } %>
+    <div class="post-grid"><% (b.articles||[]).forEach(function(a){ %><%- include('../public/_article-card', { a: a }) %><% }) %></div>
+  </div>
+</section>
