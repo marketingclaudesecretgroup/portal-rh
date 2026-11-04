@@ -20,7 +20,7 @@
 ]; if (currentUser.role === 'admin') { nav.push(['/admin/usuarios', 'Usuários', 'grupo']); nav.push(['/admin/configuracoes', 'Configurações', 'engrenagem']); } %>
 <div class="shell">
   <aside class="side" id="side">
-    <a class="side__brand" href="/admin"><span class="side__mark">S</span><span><strong><%= settings.site_name %></strong><small>Painel de conteúdo</small></span></a>
+    <a class="side__brand" href="/admin"><img class="side__logo" src="<%= settings.logo || '/static/images/secret-group.png' %>" alt="<%= settings.logo ? settings.site_name : 'Secret Group' %>"><span><strong><%= settings.site_name %></strong><small>Painel de conteúdo</small></span></a>
     <nav class="side__nav">
       <% nav.forEach(function(n){ var active = n[0] === '/admin' ? (currentPath === '/admin' || currentPath === '/admin/') : currentPath.indexOf(n[0]) === 0; %>
         <a href="<%= n[0] %>" class="<%= active ? 'is-active' : '' %>"><%- icon(n[2]) %><span><%= n[1] %></span></a>

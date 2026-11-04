@@ -2,9 +2,8 @@
 <footer class="site-footer">
   <div class="container site-footer__grid">
     <div>
-      <a class="brand brand--light" href="/">
-        <% if (settings.logo) { %><img src="<%= settings.logo %>" alt="<%= settings.site_name %>"><% } else { %>
-        <span class="brand__mark" aria-hidden="true">S</span><span class="brand__text"><strong>SECRET</strong><small>GROUP</small></span><% } %>
+      <a class="brand brand--light<%= settings.logo ? '' : ' brand--default' %>" href="/">
+        <img src="<%= settings.logo || '/static/images/secret-group.png' %>" alt="<%= settings.logo ? settings.site_name : 'Secret Group' %>" loading="lazy">
       </a>
       <p class="site-footer__name"><%= settings.site_name %><% if (settings.site_tagline) { %> • <%= settings.site_tagline %><% } %></p>
       <p class="site-footer__about"><%= settings.footer_about %></p>

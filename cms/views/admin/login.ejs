@@ -1,7 +1,7 @@
 <%- include('_head') %>
 <div class="auth">
   <form class="auth__box" method="post" action="/admin/login">
-    <div class="auth__brand"><span class="side__mark">S</span><div><strong><%= settings.site_name %></strong><small>Painel de conteúdo</small></div></div>
+    <div class="auth__brand"><img class="auth__logo<%= settings.logo ? '' : ' auth__logo--default' %>" src="<%= settings.logo || '/static/images/secret-group.png' %>" alt="<%= settings.logo ? settings.site_name : 'Secret Group' %>"><div><strong><%= settings.site_name %></strong><small>Painel de conteúdo</small></div></div>
     <h1>Entrar</h1>
     <% if (error) { %><div class="flash flash--erro"><%= error %></div><% } %>
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">

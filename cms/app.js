@@ -14,6 +14,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.locals.adminAssetVersion = crypto.createHash('sha256')
   .update(fs.readFileSync(path.join(__dirname, 'public', 'js', 'admin.js')))
   .update(fs.readFileSync(path.join(__dirname, 'public', 'css', 'admin.css'))).digest('hex').slice(0, 12);
+app.locals.siteAssetVersion = crypto.createHash('sha256')
+  .update(fs.readFileSync(path.join(__dirname, 'public', 'css', 'site.css'))).digest('hex').slice(0, 12);
 if (process.env.TRUST_PROXY !== 'false') app.set('trust proxy', 1);
 app.disable('x-powered-by');
 

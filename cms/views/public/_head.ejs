@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/site.css">
+  <link rel="stylesheet" href="/static/css/site.css?v=<%= siteAssetVersion %>">
 </head>
 <body>
 <% if (currentUser) { %>
@@ -24,10 +24,8 @@
 <% } %>
 <header class="site-header">
   <div class="container site-header__inner">
-    <a class="brand" href="/" aria-label="<%= settings.site_name %> — início">
-      <% if (settings.logo) { %><img src="<%= settings.logo %>" alt="<%= settings.site_name %>"><% } else { %>
-      <span class="brand__mark" aria-hidden="true">S</span><span class="brand__text"><strong>SECRET</strong><small>GROUP</small></span>
-      <% } %>
+    <a class="brand<%= settings.logo ? '' : ' brand--default' %>" href="/" aria-label="<%= settings.site_name %> — início">
+      <img src="<%= settings.logo || '/static/images/secret-group.png' %>" alt="<%= settings.logo ? settings.site_name : 'Secret Group' %>">
     </a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><span class="sr">Menu</span></button>
     <nav class="site-nav" id="site-nav" aria-label="Navegação principal">

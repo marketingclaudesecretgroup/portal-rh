@@ -22,10 +22,11 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
 /* Estrutura */
 .shell { display: flex; min-height: 100vh; }
 .side { position: sticky; top: 0; height: 100vh; width: 248px; flex: 0 0 248px; display: flex; flex-direction: column; background: var(--side); color: #d8d3ca; padding: 20px 14px; }
-.side__brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; padding: 4px 8px 22px; border-bottom: 1px solid #2c2a27; }
+.side__brand { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; text-decoration: none; color: #fff; padding: 4px 8px 22px; border-bottom: 1px solid #2c2a27; }
 .side__brand strong { display: block; font-size: 15px; }
 .side__brand small { display: block; font-size: 12px; color: #9c968c; }
-.side__mark { display: grid; place-items: center; width: 34px; height: 38px; flex: 0 0 34px; background: #fff; color: var(--side); font-weight: 800; font-style: italic; font-size: 22px; border-radius: 4px 13px 4px 13px; }
+.side__logo, .auth__logo { display: block; width: 174px; height: 69px; max-width: 100%; object-fit: contain; }
+.auth__logo--default { width: 190px; height: 80px; padding: 6px 10px; background: #151515; border-radius: 8px; }
 .side__nav { display: grid; gap: 2px; margin-top: 18px; }
 .side__nav a, .side__site { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; text-decoration: none; font-weight: 500; }
 .side__nav a .ic, .side__site .ic { width: 20px; height: 20px; flex: 0 0 20px; }
@@ -118,11 +119,11 @@ a.stat:hover { border-color: var(--gold); }
 /* Login */
 .auth { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(120% 120% at 80% 10%, #2f2b25, #121211 70%); }
 .auth__box { width: 100%; max-width: 420px; background: #fff; border-radius: 14px; padding: 34px; box-shadow: 0 30px 70px rgba(0,0,0,.35); }
-.auth__brand { display: flex; align-items: center; gap: 12px; margin-bottom: 26px; }
-.auth__brand .side__mark { background: var(--text); color: #fff; }
+.auth__brand { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 26px; }
 .auth__brand strong { display: block; } .auth__brand small { color: var(--muted); }
 .auth h1 { margin-bottom: 18px; font-size: 26px; }
 .auth p.muted { margin-top: -8px; margin-bottom: 18px; }
+.auth p.muted.center { margin: 16px 0 0; }
 
 /* Editor */
 .editor-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 26px; align-items: start; }

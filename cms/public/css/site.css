@@ -46,6 +46,10 @@ p { margin: 0; }
 .site-header__inner { display: flex; align-items: center; justify-content: space-between; min-height: 76px; gap: 20px; }
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
 .brand img { max-height: 46px; width: auto; }
+.brand--default { flex-shrink: 0; padding: 4px 10px; background: var(--dark); border-radius: 6px; }
+.brand--default img { width: 146px; height: auto; max-height: none; }
+.site-footer .brand--default { padding: 0; background: none; }
+.site-footer .brand--default img { width: 190px; }
 .brand__mark { display: grid; place-items: center; width: 36px; height: 40px; background: var(--text); color: #fff; font-weight: 800; font-size: 26px; border-radius: 4px 14px 4px 14px; font-style: italic; }
 .brand__text { display: flex; flex-direction: column; line-height: 1; }
 .brand__text strong { font-size: 19px; letter-spacing: .06em; font-weight: 800; }

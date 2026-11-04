@@ -1,7 +1,7 @@
 <%- include('_head') %>
 <div class="auth">
   <form class="auth__box" method="post" action="/admin/setup">
-    <div class="auth__brand"><span class="side__mark">S</span><div><strong><%= settings.site_name %></strong><small>Configuração inicial</small></div></div>
+    <div class="auth__brand"><img class="auth__logo<%= settings.logo ? '' : ' auth__logo--default' %>" src="<%= settings.logo || '/static/images/secret-group.png' %>" alt="<%= settings.logo ? settings.site_name : 'Secret Group' %>"><div><strong><%= settings.site_name %></strong><small>Configuração inicial</small></div></div>
     <h1>Criar administrador</h1>
     <p class="muted">Este é o primeiro acesso. Crie a conta que vai administrar o portal — depois você poderá adicionar outras pessoas.</p>
     <% if (error) { %><div class="flash flash--erro"><%= error %></div><% } %>
