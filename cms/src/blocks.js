@@ -1,6 +1,7 @@
 // Definição dos blocos de conteúdo. O editor do admin é gerado a partir daqui,
 // e cada bloco tem um template em views/blocks/<tipo>.ejs.
-const sanitizeHtml = require('sanitize-html');
+// Gerado no postinstall: funciona também nos runtimes que desabilitam require(ESM).
+const sanitizeHtml = require('./sanitize-html.cjs');
 const { ICONS } = require('./icons');
 
 const BG = { key: 'background', label: 'Fundo', type: 'select', options: [['branco', 'Branco'], ['suave', 'Bege suave'], ['escuro', 'Escuro']], default: 'branco' };

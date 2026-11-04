@@ -3,3 +3,4 @@ data/
 *.log
 .env
 .vercel
+/src/sanitize-html.cjs

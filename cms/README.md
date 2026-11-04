@@ -1,5 +1,11 @@
 # Comunica Secret — CMS do Portal de Gente & Gestão
 
+### Compatibilidade com o runtime da Vercel
+
+Use Node.js 22.12 ou mais recente. `npm ci` executa o `postinstall`, que gera `src/sanitize-html.cjs` com o sanitizador e suas dependências em CommonJS. Esse arquivo também é gerado por `npm run build` e pelo build da Vercel. Isso permite manter `sanitize-html` 2.18.1 nos ambientes serverless que desabilitam `require(ESM)`.
+
+O arquivo gerado não é versionado e não deve ser editado manualmente. A Vercel o inclui no pacote da função. Após atualizar as dependências, execute `npm run build` antes de iniciar a aplicação. Para conferir a inicialização, os templates, a sanitização e os arquivos estáticos no modo restrito, execute `npm run test:runtime`; esse teste não precisa de banco de dados.
+
 CMS em **Node.js (Express)** para o portal do RH da Secret Outlet, pronto para rodar na **Vercel** com **Supabase**:
 
 - **Supabase Postgres** guarda páginas, comunicados, usuários, configurações e sessões de login.

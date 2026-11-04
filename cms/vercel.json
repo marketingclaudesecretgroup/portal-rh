@@ -5,7 +5,7 @@
   "functions": {
     "api/index.js": {
       "maxDuration": 30,
-      "includeFiles": "{views/**,public/**,node_modules/quill/dist/**}"
+      "includeFiles": "{views/**,public/**,node_modules/quill/dist/**,src/sanitize-html.cjs}"
     }
   },
   "rewrites": [

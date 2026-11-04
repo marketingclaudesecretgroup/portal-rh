@@ -1,5 +1,11 @@
 # Verificação do Portal RH
 
+## Inicialização serverless (04/11/2026)
+
+O erro `ERR_REQUIRE_ESM` em `htmlparser2` foi reproduzido com `node --no-experimental-require-module`, a restrição do ambiente que derrubava a função antes de servir qualquer página. A instalação/build agora empacota o `sanitize-html` 2.18.1 e suas dependências em CommonJS, mantendo a versão atual do sanitizador.
+
+`npm run test:runtime` aprovou quatro verificações com essa restrição: carregamento do handler da Vercel, remoção de HTML ativo e preservação da formatação, renderização EJS e respostas HTTP 200 para CSS e Quill. Esses testes não dependem de credenciais ou conexão Postgres. O arquivo CommonJS é gerado automaticamente no `postinstall` e incluído na função pelo `vercel.json`.
+
 ## Versão Vercel + Supabase (04/11/2026)
 
 O CMS passou a usar Postgres (Supabase) no lugar do SQLite e o Supabase Storage para arquivos. Todas as correções listadas abaixo foram mantidas na nova versão, e a mesma suíte foi adaptada para o Postgres (cada execução usa um *schema* temporário).
