@@ -10,22 +10,58 @@
   });
 
   // Upload: pede autorização ao servidor; com Supabase, o arquivo vai direto do navegador para o Storage
+  function errorMessage(value, fallback, depth) {
+    if (typeof value === 'string' && value.trim() && value !== '[object Object]') return value.trim().slice(0, 400);
+    if (value && typeof value === 'object' && (depth || 0) < 4) {
+      var keys = ['message', 'error', 'msg', 'error_description'];
+      for (var i = 0; i < keys.length; i++) {
+        var message = errorMessage(value[keys[i]], '', (depth || 0) + 1);
+        if (message) return message;
+      }
+    }
+    return fallback;
+  }
+  function requestJSON(url, options, timeout) {
+    var controller = new AbortController();
+    var timer = setTimeout(function () { controller.abort(); }, timeout || 30000);
+    options.signal = controller.signal;
+    return fetch(url, options).then(function (r) {
+      return r.text().then(function (body) {
+        var data;
+        try { data = body ? JSON.parse(body) : {}; } catch (_) {
+          if (r.ok) throw new Error('A resposta do envio é inválida. Recarregue a página e tente novamente.');
+          data = /^\s*</.test(body) ? {} : body;
+        }
+        if (!r.ok || (data && data.error)) throw new Error(errorMessage(data, 'Não foi possível enviar o arquivo (HTTP ' + r.status + ').'));
+        return data;
+      });
+    }).catch(function (error) {
+      if (error.name === 'AbortError') throw new Error('O envio demorou além do esperado. Verifique sua conexão e tente novamente.');
+      if (error instanceof TypeError) throw new Error('Não foi possível conectar ao armazenamento. Verifique sua conexão e tente novamente.');
+      throw error;
+    }).finally(function () { clearTimeout(timer); });
+  }
   function postJSON(url, data) {
-    return fetch(url, { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF, Accept: 'application/json' } })
-      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.error || 'Falha no envio'); return j; }); });
+    return requestJSON(url, { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF, Accept: 'application/json' } });
   }
   function uploadFile(file) {
     var meta = { name: file.name, type: file.type, size: file.size };
     return postJSON('/admin/midia/assinar', meta).then(function (sig) {
       if (sig.mode === 'supabase') {
-        return fetch(sig.signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type, 'x-upsert': 'false', 'cache-control': 'max-age=31536000' } })
-          .then(function (r) { if (!r.ok) return r.text().then(function (t) { throw new Error('O armazenamento recusou o arquivo (' + r.status + '). ' + t.slice(0, 120)); }); })
+        // Mesmo formato do uploadToSignedUrl do SDK: metadados antes do arquivo.
+        // O navegador define o Content-Type com o boundary do multipart.
+        var signedBody = new FormData();
+        signedBody.append('cacheControl', '31536000');
+        signedBody.append('', file, file.name);
+        return requestJSON(sig.signedUrl, { method: 'PUT', body: signedBody, headers: { 'x-upsert': 'false' } }, 120000)
           .then(function () { meta.path = sig.path; return postJSON('/admin/midia/confirmar', meta); });
       }
       var fd = new FormData();
       fd.append('file', file);
-      return fetch('/admin/midia/enviar', { method: 'POST', body: fd, headers: { 'X-CSRF-Token': CSRF, Accept: 'application/json' } })
-        .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || 'Falha no envio'); return j; }); });
+      return requestJSON('/admin/midia/enviar', { method: 'POST', body: fd, headers: { 'X-CSRF-Token': CSRF, Accept: 'application/json' } }, 120000);
+    }).then(function (item) {
+      if (!item || typeof item.url !== 'string' || !item.url) throw new Error('O arquivo foi enviado, mas não foi possível obter seu endereço. Tente novamente.');
+      return item;
     });
   }
   window.uploadFile = uploadFile;
@@ -37,13 +73,14 @@
   function loadGrid() {
     var grid = modal.querySelector('[data-grid]');
     grid.innerHTML = '<p class="muted">Carregando…</p>';
-    fetch('/admin/midia.json', { headers: { Accept: 'application/json' } }).then(function (r) { return r.json(); }).then(function (items) {
+    return requestJSON('/admin/midia.json', { headers: { Accept: 'application/json' } }).then(function (items) {
+      if (!Array.isArray(items)) throw new Error('Não foi possível carregar a biblioteca de imagens.');
       if (!items.length) { grid.innerHTML = '<p class="muted">Nenhum arquivo ainda. Envie o primeiro pelo botão acima.</p>'; return; }
       grid.innerHTML = items.map(function (m) {
         var thumb = m.mime === 'application/pdf' ? '<span class="media-item__pdf">PDF</span>' : '<img src="' + esc(m.url) + '" alt="" loading="lazy">';
         return '<button type="button" class="media-item media-item--pick" data-url="' + esc(m.url) + '">' + thumb + '<span>' + esc(m.original_name) + '</span></button>';
       }).join('');
-    });
+    }).catch(function (error) { grid.textContent = errorMessage(error, 'Não foi possível carregar as imagens. Tente abrir a biblioteca novamente.'); });
   }
   window.openMediaPicker = function (cb) {
     if (!modal) return;
@@ -69,7 +106,7 @@
       var grid = modal.querySelector('[data-grid]');
       grid.innerHTML = '<p class="muted">Enviando “' + esc(f.name) + '”…</p>';
       uploadFile(f).then(function (j) { if (pickCallback) pickCallback(j.url); closeModal(modal); })
-        .catch(function (err) { alert(err.message); loadGrid(); })
+        .catch(function (err) { grid.textContent = errorMessage(err, 'Não foi possível enviar o arquivo. Tente novamente.'); alert(grid.textContent); })
         .finally(function () { e.target.value = ''; });
     });
   }

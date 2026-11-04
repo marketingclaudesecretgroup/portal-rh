@@ -13,6 +13,7 @@
     "test": "node --test --test-concurrency=1 tests/system.test.js",
     "test:ui": "node --test --test-concurrency=1 tests/browser.test.js",
     "test:runtime": "node --test tests/runtime.test.js",
+    "test:uploads": "node --test --test-concurrency=1 tests/uploads.test.js tests/upload-browser.test.js",
     "reset-password": "node scripts/reset-password.js"
   },
   "engines": {

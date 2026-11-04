@@ -6,6 +6,14 @@ Use Node.js 22.12 ou mais recente. `npm ci` executa o `postinstall`, que gera `s
 
 O arquivo gerado não é versionado e não deve ser editado manualmente. A Vercel o inclui no pacote da função. Após atualizar as dependências, execute `npm run build` antes de iniciar a aplicação. Para conferir a inicialização, os templates, a sanitização e os arquivos estáticos no modo restrito, execute `npm run test:runtime`; esse teste não precisa de banco de dados.
 
+### Envio de imagens na Vercel
+
+Configure `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` no ambiente **Production** da Vercel e faça um novo deploy após salvar. A chave fica exclusivamente no servidor. Ela pode ser obtida no Supabase em **Settings → API Keys → Legacy anon, service_role API keys → service_role**. Nunca use a chave `anon` nessa variável nem coloque credenciais no repositório.
+
+O navegador solicita uma URL assinada, envia o arquivo diretamente ao Storage como multipart e confirma o registro no portal. A imagem não passa pela função da Vercel. Sem as duas variáveis, a aplicação informa a falta de configuração; ela não tenta gravar no disco temporário da Vercel. O bucket de imagens deve ser público para que as URLs exibidas nas páginas funcionem.
+
+Para verificar esse fluxo sem credenciais reais nem Postgres, execute `npm run test:uploads` após instalar o Chromium ou configurar `PLAYWRIGHT_CHANNEL=chrome`. Os testes usam o SDK do Supabase com um serviço HTTP simulado e verificam o seletor e a prévia no navegador. Os scripts do painel recebem uma versão baseada no conteúdo para evitar código antigo no cache depois do deploy.
+
 CMS em **Node.js (Express)** para o portal do RH da Secret Outlet, pronto para rodar na **Vercel** com **Supabase**:
 
 - **Supabase Postgres** guarda páginas, comunicados, usuários, configurações e sessões de login.

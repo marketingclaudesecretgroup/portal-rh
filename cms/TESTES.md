@@ -1,5 +1,11 @@
 # Verificação do Portal RH
 
+## Envio de imagens (04/11/2026)
+
+`npm run test:uploads` aprovou **15 testes**, com Storage HTTP simulado e Chrome headless, sem dados ou credenciais de produção. Cobrem URL assinada pelo SDK real, criação de bucket ausente, credenciais recusadas, bucket privado, confirmação, exclusão com falha, envio multipart com o nome original, prévia da imagem no editor, erros aninhados, limite de espera, erro na biblioteca e envio local de desenvolvimento.
+
+Na Vercel, a ausência de `SUPABASE_URL` ou `SUPABASE_SERVICE_ROLE_KEY` agora rejeita tanto a assinatura quanto o endpoint antigo de envio local, com JSON legível e sem aguardar um erro 504. Falhas de disco e banco no callback do upload local também são capturadas. A correção troca respostas `[object Object]` por mensagens, libera o campo após falhas e usa uma URL versionada para o script do painel. A suíte de runtime (**4 testes**) também passou após a alteração. A configuração real do Storage e o upload autenticado devem ser confirmados no projeto de produção após cadastrar as variáveis.
+
 ## Inicialização serverless (04/11/2026)
 
 O erro `ERR_REQUIRE_ESM` em `htmlparser2` foi reproduzido com `node --no-experimental-require-module`, a restrição do ambiente que derrubava a função antes de servir qualquer página. A instalação/build agora empacota o `sanitize-html` 2.18.1 e suas dependências em CommonJS, mantendo a versão atual do sanitizador.

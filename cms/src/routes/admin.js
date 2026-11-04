@@ -244,22 +244,30 @@ router.post('/midia/assinar', async (req, res) => {
   const meta = { name: String(req.body.name || ''), type: String(req.body.type || ''), size: parseInt(req.body.size, 10) || 0 };
   const err = storage.validate(meta);
   if (err) return res.status(400).json({ error: err });
-  if (!storage.useSupabase) return res.json({ mode: 'local' });
-  try { res.json(await storage.signUpload(meta)); }
-  catch (e) { console.error(e); res.status(500).json({ error: 'Não foi possível preparar o envio: ' + e.message }); }
+  try {
+    storage.assertConfigured();
+    if (!storage.useSupabase) return res.json({ mode: 'local' });
+    res.json(await storage.signUpload(meta));
+  }
+  catch (e) { console.error(e); res.status(500).json({ error: storage.errorMessage(e, 'Não foi possível preparar o envio.') }); }
 });
 // 2a) Supabase: depois do envio direto, registra o arquivo
 router.post('/midia/confirmar', async (req, res) => {
   const meta = { name: String(req.body.name || ''), type: String(req.body.type || ''), size: parseInt(req.body.size, 10) || 0 };
   const p = String(req.body.path || '');
-  if (storage.validate(meta) || !/^\d{4}\/\d{2}\/[\w.-]+$/.test(p) || !(await storage.exists(p))) return res.status(400).json({ error: 'Arquivo não encontrado no armazenamento.' });
-  const url = storage.publicUrl(p);
-  const r = await db.get('INSERT INTO media (path, url, original_name, mime, size, uploaded_by) VALUES (?,?,?,?,?,?) RETURNING id', [p, url, meta.name.slice(0, 200), meta.type, meta.size, req.user.id]);
-  res.json({ id: r.id, url, original_name: meta.name, mime: meta.type });
+  if (storage.validate(meta) || !/^\d{4}\/\d{2}\/[\w.-]+$/.test(p)) return res.status(400).json({ error: 'Arquivo não encontrado no armazenamento.' });
+  try {
+    if (!(await storage.exists(p))) return res.status(400).json({ error: 'Arquivo não encontrado no armazenamento.' });
+    const url = storage.publicUrl(p);
+    const r = await db.get('INSERT INTO media (path, url, original_name, mime, size, uploaded_by) VALUES (?,?,?,?,?,?) RETURNING id', [p, url, meta.name.slice(0, 200), meta.type, meta.size, req.user.id]);
+    res.json({ id: r.id, url, original_name: meta.name, mime: meta.type });
+  } catch (e) { console.error(e); res.status(500).json({ error: storage.errorMessage(e, 'Não foi possível registrar a imagem enviada.') }); }
 });
 // 2b) Local (desenvolvimento): envio pelo servidor
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: storage.MAX_SIZE } });
 router.post('/midia/enviar', (req, res) => {
+  try { storage.assertConfigured(); }
+  catch (e) { return res.status(503).json({ error: storage.errorMessage(e) }); }
   if (storage.useSupabase) return res.status(400).json({ error: 'Envio direto desativado.' });
   upload.single('file')(req, res, async (err) => {
     if (err) return res.status(400).json({ error: err.code === 'LIMIT_FILE_SIZE' ? 'Arquivo maior que 10 MB.' : err.message });
@@ -267,10 +275,12 @@ router.post('/midia/enviar', (req, res) => {
     const meta = { name: req.file.originalname, type: req.file.mimetype, size: req.file.size };
     const verr = storage.validate(meta);
     if (verr) return res.status(400).json({ error: verr });
-    const p = storage.saveLocal(req.file.buffer, meta);
-    const url = storage.publicUrl(p);
-    const r = await db.get('INSERT INTO media (path, url, original_name, mime, size, uploaded_by) VALUES (?,?,?,?,?,?) RETURNING id', [p, url, meta.name.slice(0, 200), meta.type, meta.size, req.user.id]);
-    res.json({ id: r.id, url, original_name: meta.name, mime: meta.type });
+    try {
+      const p = storage.saveLocal(req.file.buffer, meta);
+      const url = storage.publicUrl(p);
+      const r = await db.get('INSERT INTO media (path, url, original_name, mime, size, uploaded_by) VALUES (?,?,?,?,?,?) RETURNING id', [p, url, meta.name.slice(0, 200), meta.type, meta.size, req.user.id]);
+      res.json({ id: r.id, url, original_name: meta.name, mime: meta.type });
+    } catch (e) { console.error(e); res.status(500).json({ error: 'Não foi possível salvar o arquivo. Verifique o armazenamento e tente novamente.' }); }
   });
 });
 router.post('/midia/:id/excluir', async (req, res) => {
